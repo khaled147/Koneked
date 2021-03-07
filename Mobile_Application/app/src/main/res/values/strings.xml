@@ -1,10 +1,14 @@
 <resources>
     <string name="app_name">Koneked</string>
+    <string name="device_name">Koneked_device</string>
     <!-- Home String resources -->
     <string name="title_home">Home</string>
     <string name="not_connected">Device not connected</string>
+    <string name="not_connected_image">Device not connected image icon</string>
     <string name="connected">Device connected</string>
+    <string name="connected_image">Device connected image icon</string>
     <string name="error_connection">An error has occurred</string>
+    <string name="error_connection_image">Error image icon</string>
     <string name="connection_button">Connect</string>
     <!-- Dashboard String resources -->
     <string name="title_dashboard">Dashboard</string>
@@ -15,4 +19,11 @@
     <string name="Motor_3_test">Test Vibration Motor 3</string>
     <!-- Notification String resources -->
     <string name="title_notifications">Notifications</string>
+    <!-- Error Messages -->
+    <string name="no_bluetooth">This device does not support Bluetooth</string>
+    <string name="bluetooth_enabled">Bluetooth has been enabled</string>
+    <string name="dialog_message">Please connect your Koneked device through your Bluetooth settings</string>
+    <string name="dialog_title">Important</string>
+    <string name="dialog_positive">Yes</string>
+    <string name="dialog_negative">No</string>
 </resources>
