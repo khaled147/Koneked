@@ -1,6 +1,18 @@
 <resources>
     <string name="app_name">Koneked</string>
+    <!-- Home String resources -->
     <string name="title_home">Home</string>
+    <string name="not_connected">Device not connected</string>
+    <string name="connected">Device connected</string>
+    <string name="error_connection">An error has occurred</string>
+    <string name="connection_button">Connect</string>
+    <!-- Dashboard String resources -->
     <string name="title_dashboard">Dashboard</string>
+    <string name="device_test">Test Device Connection</string>
+    <string name="API_test">Test API Connection</string>
+    <string name="Motor_1_test">Test Vibration Motor 1</string>
+    <string name="Motor_2_test">Test Vibration Motor 2</string>
+    <string name="Motor_3_test">Test Vibration Motor 3</string>
+    <!-- Notification String resources -->
     <string name="title_notifications">Notifications</string>
 </resources>
