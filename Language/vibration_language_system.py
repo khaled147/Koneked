@@ -1,3 +1,6 @@
+import speech_recognition as s_r
+import argparse
+
 dit = 1000
 dah = dit*3
 
@@ -185,8 +188,26 @@ def cha_to_vib(x):
         vib3 = dit
     print(vib1, vib2, vib3, x)
 
-f = open("test.txt", 'rt')
-lines = f.readlines()
-for line in lines:
-    for cha in line:
-        cha_to_vib(cha)
+#parser = argparse.ArgumentParser()
+#parser.add_argument("-t", "--text", help="string with text form of input speech")
+#args = parser.parse_args()
+
+r = s_r.Recognizer()
+my_mic = s_r.Microphone(device_index=1) #my device index is 1, you have to put your device index
+with my_mic as source:
+    print("Say now!!!!")
+    r.adjust_for_ambient_noise(source) #reduce noise
+    audio = r.listen(source) #take voice input from the microphone
+test = r.recognize_google(audio)
+print(test) #to print voice into text
+
+#line = args.text
+#print(line)
+for cha in test:
+    cha_to_vib(cha)
+
+#f = open("test.txt", 'rt')
+#lines = f.readlines()
+#for line in lines:
+#    for cha in line:
+#        cha_to_vib(cha)
