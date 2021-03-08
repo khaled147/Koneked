@@ -1,5 +1,4 @@
 import speech_recognition as s_r
-import argparse
 
 dit = 1000
 dah = dit*3
@@ -188,10 +187,6 @@ def cha_to_vib(x):
         vib3 = dit
     print(vib1, vib2, vib3, x)
 
-#parser = argparse.ArgumentParser()
-#parser.add_argument("-t", "--text", help="string with text form of input speech")
-#args = parser.parse_args()
-
 r = s_r.Recognizer()
 my_mic = s_r.Microphone(device_index=1) #my device index is 1, you have to put your device index
 with my_mic as source:
@@ -201,8 +196,6 @@ with my_mic as source:
 test = r.recognize_google(audio)
 print(test) #to print voice into text
 
-#line = args.text
-#print(line)
 for cha in test:
     cha_to_vib(cha)
 
