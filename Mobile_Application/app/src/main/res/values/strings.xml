@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Koneked</string>
+    <!-- Bluetooth Connections -->
+    <string name="bluetoot_connection_error">There seems to be an issue with yout bluetooth connection.
+        Please ensure it is on</string>
+    <string name="init_scan">Initialize Scan</string>
+    <string name="motor_test">Testing motors</string>
 </resources>
