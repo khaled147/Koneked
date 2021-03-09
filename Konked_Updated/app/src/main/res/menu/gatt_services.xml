@@ -13,8 +13,4 @@
           android:title="@string/menu_disconnect"
           android:orderInCategory="2"
           app:showAsAction="ifRoom|withText"/>
-    <item android:id="@+id/menu_stream"
-          android:title="@string/menu_stream"
-          android:orderInCategory="4"
-          app:showAsAction="ifRoom|withText"/>
 </menu>

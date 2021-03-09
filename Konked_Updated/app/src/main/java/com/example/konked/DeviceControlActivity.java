@@ -29,10 +29,10 @@ public class DeviceControlActivity extends Activity {
     private TextView mConnectionState;
     private TextView mDataField;
     private Switch mSwitchField;
+    private LinearLayout mSwitchLayout;
     private String mDeviceAddress;
     private ExpandableListView mGattServicesList;
     private BluetoothLeService mBluetoothLeService;
-    private boolean isTesting = false;
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -52,6 +52,7 @@ public class DeviceControlActivity extends Activity {
             mBluetoothLeService = null;
         }
     };
+    private boolean isTesting = false;
     private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
             new ArrayList<>();
     private boolean mConnected = false;
@@ -88,7 +89,7 @@ public class DeviceControlActivity extends Activity {
     // demonstrates 'Read' and 'Notify' features.  See
     // http://d.android.com/reference/android/bluetooth/BluetoothGatt.html for the complete
     // list of supported characteristic features.
-    private final ExpandableListView.OnChildClickListener servicesListClickListner =
+    private final ExpandableListView.OnChildClickListener servicesListClickListener =
             new ExpandableListView.OnChildClickListener() {
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
@@ -97,6 +98,8 @@ public class DeviceControlActivity extends Activity {
                         final BluetoothGattCharacteristic characteristic =
                                 mGattCharacteristics.get(groupPosition).get(childPosition);
                         final int charaProp = characteristic.getProperties();
+                        Log.i(TAG, "onChildClick: groupPosition " + groupPosition);
+                        Log.i(TAG, "onChildClick: childPosition " + childPosition);
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0 && !isTesting) {
                             // If there is an active notification on a characteristic, clear
                             // it first so it doesn't update the data field on the user interface.
@@ -107,11 +110,6 @@ public class DeviceControlActivity extends Activity {
                             }
                             mBluetoothLeService.readCharacteristic(characteristic);
                         }
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0 && !isTesting) {
-                            mNotifyCharacteristic = characteristic;
-                            mBluetoothLeService.setCharacteristicNotification(
-                                    characteristic, true);
-                        }
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0 && !isTesting) {
                             mNotifyCharacteristic = characteristic;
                             mBluetoothLeService.setCharacteristicIndication(
@@ -119,13 +117,22 @@ public class DeviceControlActivity extends Activity {
                         }
                         if ((charaProp | BluetoothGattCharacteristic.PROPERTY_WRITE) > 0 && isTesting) {
                             byte[] value = "U".getBytes();
-                            Log.e(TAG, "onChildClick: " + value);
                             if (mNotifyCharacteristic != null) {
-                                mBluetoothLeService.setCharacteristicNotification(
-                                        mNotifyCharacteristic, false);
+                                mBluetoothLeService.setCharacteristicNotification(mNotifyCharacteristic, false);
                                 mNotifyCharacteristic = null;
                             }
-                            mBluetoothLeService.writeCharacteristic(characteristic, value);
+                            boolean state = mBluetoothLeService.writeCharacteristic(characteristic, value);
+                            if (!state) {
+                                // TODO: Fix the logical error that occurs when tapping on the microphone characteristic
+                                Toast.makeText(DeviceControlActivity.this, R.string.motor_setup_error,
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }
+                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0 && !isTesting) {
+                            Log.d(TAG, "onChildClick: Characteristic notification for " + groupPosition + ", " +
+                                    childPosition);
+                            mNotifyCharacteristic = characteristic;
+                            mBluetoothLeService.setCharacteristicNotification(characteristic, true);
                         }
                         return true;
                     }
@@ -141,6 +148,7 @@ public class DeviceControlActivity extends Activity {
         intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
         return intentFilter;
     }
+
 
     private void clearUI() {
         mGattServicesList.setAdapter((SimpleExpandableListAdapter) null);
@@ -158,15 +166,17 @@ public class DeviceControlActivity extends Activity {
 
         // Sets up UI references.
         ((TextView) findViewById(R.id.device_address)).setText(mDeviceAddress);
-        mGattServicesList = (ExpandableListView) findViewById(R.id.gatt_services_list);
-        mGattServicesList.setOnChildClickListener(servicesListClickListner);
-        mConnectionState = (TextView) findViewById(R.id.connection_state);
-        mDataField = (TextView) findViewById(R.id.data_value);
+        mGattServicesList = findViewById(R.id.gatt_services_list);
+        mGattServicesList.setOnChildClickListener(servicesListClickListener);
+        mConnectionState = findViewById(R.id.connection_state);
+        mDataField = findViewById(R.id.data_value);
         mSwitchField = findViewById(R.id.motor_switch);
-        mSwitchField.setVisibility(View.INVISIBLE);
+        mSwitchLayout = findViewById(R.id.switch_layout);
 
-        if (mDeviceName == "Koneked") {
-            mSwitchField.setVisibility(View.VISIBLE);
+        Log.e(TAG, "onCreate: " + mDeviceName);
+        if (mDeviceName.equals("BLE Koneked Device")) {
+            Toast.makeText(this, R.string.found_device, Toast.LENGTH_SHORT).show();
+            mSwitchLayout.setVisibility(View.VISIBLE);
         }
 
         mSwitchField.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

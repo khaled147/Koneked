@@ -30,11 +30,8 @@ public class DeviceScanActivity extends ListActivity {
     private static final long SCAN_PERIOD = 10000;
     private final int REQUEST_LOCATION_PERMISSION = 1;
     private LeDeviceListAdapter mLeDeviceListAdapter;
-    private BluetoothAdapter mBluetoothAdapter;
-    private boolean mScanning;
-    private Handler mHandler;
     // Device scan callback.
-    private BluetoothAdapter.LeScanCallback mLeScanCallback =
+    private final BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
 
                 @Override
@@ -48,6 +45,9 @@ public class DeviceScanActivity extends ListActivity {
                     });
                 }
             };
+    private BluetoothAdapter mBluetoothAdapter;
+    private boolean mScanning;
+    private Handler mHandler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -205,8 +205,8 @@ public class DeviceScanActivity extends ListActivity {
 
     // Adapter for holding devices found through scanning.
     private class LeDeviceListAdapter extends BaseAdapter {
-        private ArrayList<BluetoothDevice> mLeDevices;
-        private LayoutInflater mInflator;
+        private final ArrayList<BluetoothDevice> mLeDevices;
+        private final LayoutInflater mInflator;
 
         public LeDeviceListAdapter() {
             super();
@@ -250,8 +250,8 @@ public class DeviceScanActivity extends ListActivity {
             if (view == null) {
                 view = mInflator.inflate(R.layout.listitem_device, null);
                 viewHolder = new ViewHolder();
-                viewHolder.deviceAddress = (TextView) view.findViewById(R.id.device_address);
-                viewHolder.deviceName = (TextView) view.findViewById(R.id.device_name);
+                viewHolder.deviceAddress = view.findViewById(R.id.device_address);
+                viewHolder.deviceName = view.findViewById(R.id.device_name);
                 view.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) view.getTag();

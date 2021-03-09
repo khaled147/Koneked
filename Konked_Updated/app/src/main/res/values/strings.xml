@@ -1,6 +1,6 @@
 <resources>
     <string name="label_data">Data:</string>
-    <string name="motor_input">Turn On to Test Selected Motor</string>
+    <string name="motor_input">Turn on to test selected motor</string>
     <string name="label_device_address">Device address:</string>
     <string name="label_state">State:</string>
     <string name="no_data">No data</string>
@@ -8,6 +8,10 @@
     <string name="disconnected">Disconnected</string>
     <string name="title_devices">BLE Device Scan</string>
     <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
+    <string name="found_device">You have located the Koneked Device</string>
+
+    <string name="streaming">Streaming</string>
+    <string name="motor_setup_error">Motor is not set up yet.\nPlease toggle motor switch off and tap it.</string>
 
     <string name="location_prompt">Please grant location permission to use this app</string>
     <string name="location_confirmation">Location permission granted</string>
