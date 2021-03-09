@@ -1,179 +1,250 @@
 // Implemented from https://developer.ibm.com/technologies/iot/tutorials/build-connected-devices-using-ble-apis/
 
 #include <ArduinoBLE.h>
+#include <PDM.h>
 
-// create a service to expose our service to BLE Central Devices
-BLEService Koneked("AA01");
+#define NAME_OF_PERIPHERAL "BLE Koneked Device"
 
-BLEUnsignedCharCharacteristic motor1("2101", BLERead | BLEWrite | BLENotify);
-BLEUnsignedCharCharacteristic motor2("2102", BLERead | BLEWrite | BLENotify);
-BLEUnsignedCharCharacteristic motor3("2103", BLERead | BLEWrite | BLENotify);
+// Create a service to expose our service to BLE Central Devices
+BLEService Koneked("181A");
 
-//BLEUnsignedCharCharacteristic batteryLevelChar("2104", BLERead | BLENotify);
+// Setup the incoming data characteristic (RX).
+const int RX_BUFFER_SIZE = 256;
+bool RX_BUFFER_FIXED_LENGTH = false;
 
-//BLEUnsignedCharCharacteristic scaledValueChar("2105", BLERead | BLENotify);
-//BLEDescriptor mydescriptor1("2106", "ABC1");
-//BLEDescriptor mydescriptor2("2106", "ABC2");
-//BLEDescriptor mydescriptor3("2106", "ABC3");
+// RX / TX Characteristics (Receive/Transmit Data)
+BLECharacteristic rxChar("2A3D", BLEWriteWithoutResponse | BLEWrite, RX_BUFFER_SIZE, RX_BUFFER_FIXED_LENGTH);
+BLEByteCharacteristic txChar("2A58", BLERead | BLENotify | BLEBroadcast);
+BLEDescriptor txDescriptor("2902", "ABC1");
 
+// Buffer to read samples into, each sample is 16-bits
+short sampleBuffer[256];
 
-byte motorValue = 0x00;
-int commandIterations = 0;
+// Number of samples read
+volatile int samplesRead;
 
 #define  MOTOR_1_PIN 2
 #define  MOTOR_2_PIN 4
 #define  MOTOR_3_PIN 6
 
 void setup() {
+  // Start serial
   Serial.begin(9600);
+  //Ensure serial port is ready
   while (!Serial);
 
+  // Prepare LED pins
+  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LEDR, OUTPUT);
+  pinMode(LEDG, OUTPUT);
+
+  // Prepare Motor pins
   pinMode(MOTOR_1_PIN, OUTPUT);
   pinMode(MOTOR_2_PIN, OUTPUT);
   pinMode(MOTOR_3_PIN, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
 
+  // Configure the audio data receive callback
+  PDM.onReceive(onPDMdata);
+
+  // Start PDM
+  startPDM();
+
+  // Start BLE.
+  startBLE();
+
+  // Create BLE service and characteristics
+  // Change advertised BLE Characteristics names
+  BLE.setLocalName(NAME_OF_PERIPHERAL);
+  BLE.setDeviceName(NAME_OF_PERIPHERAL);          // this sets Characteristic 0x2a00 of Service 0x1800
+  // Service 0x1800 is the Generic Access Profile
+  // Characteristic 0x2a00 is the Device Name
+  // Characteristic 0x2a01 is the "Appearance"
+  BLE.setAppearance(192);                       // BLE_APPEARANCE_GENERIC_WATCH
+  // Appearance can be determined using the following: https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.s132.api.v6.0.0%2Fgroup___b_l_e___a_p_p_e_a_r_a_n_c_e_s.html
+  BLE.setAdvertisedService(Koneked);
+  txChar.addDescriptor(txDescriptor);
+  Koneked.addCharacteristic(rxChar);
+  Koneked.addCharacteristic(txChar);
+  BLE.addService(Koneked);
+
+  // Bluetooth LE connection handlers
+  BLE.setEventHandler(BLEConnected, onBLEConnected);
+  BLE.setEventHandler(BLEDisconnected, onBLEDisconnected);
+
+  // Event driven reads.
+  rxChar.setEventHandler(BLEWritten, onRxCharValueUpdate);
+
+  // Print out full UUID and MAC address.
+  Serial.println("Peripheral advertising info: ");
+  Serial.print("Name: ");
+  Serial.println(NAME_OF_PERIPHERAL);
+  Serial.print("MAC: ");
+  Serial.println(BLE.address());
+  Serial.print("Service UUID: ");
+  Serial.println(Koneked.uuid());
+  Serial.print("rxCharacteristic UUID: ");
+  Serial.println(rxChar.uuid());
+  Serial.print("txCharacteristics UUID: ");
+  Serial.println(txChar.uuid());
+
+  Serial.println("Bluetooth device active, waiting for connections...");;
+  
+  // Advertise to the world so device can be found
+  BLE.advertise();
+}
+
+void loop()
+{
+  BLEDevice central = BLE.central();
+  if (central)
+  {
+    // Only send data if we are connected to a central device.
+    while (central.connected()) {
+      connectedLight();
+
+      // Send the microphone values to the central device.
+      if (samplesRead) {
+        // print samples to the serial monitor or plotter
+        for (int i = 0; i < samplesRead; i++) {
+          txChar.writeValue(sampleBuffer[i]);
+          Serial.println(sampleBuffer[i]);
+        }
+        // Clear the read count
+        samplesRead = 0;
+      }
+    }
+    disconnectedLight();
+  } else {
+    disconnectedLight();
+  }
+}
+
+/*
+ *  BLUETOOTH
+ */
+void startBLE() {
   if (!BLE.begin())
   {
     Serial.println("starting BLE failed!");
     while (1);
   }
-
-  String address = BLE.address();
-  Serial.println("Address is [" + address + "]");
-
-  BLE.setDeviceName("Koneked Device");      // this sets Characteristic 0x2a00 of Service 0x1800
-  // Service 0x1800 is the Generic Access Profile
-  // Characteristic 0x2a00 is the Device Name
-  // Characteristic 0x2a01 is the "Appearance"
-  BLE.setAppearance(384);                      // BLE_APPEARANCE_GENERIC_REMOTE_CONTROL
-
-  BLE.setLocalName("BLE Koneked Device");       // this sets the local name for the advertising data
-
-  // Change advertised BLE Characteristics names
-  
-  // tell the world about us
-  BLE.setAdvertisedService(Koneked);
-  //Koneked.addCharacteristic(batteryLevelChar);
-  Koneked.addCharacteristic(motor1);
-  Koneked.addCharacteristic(motor2);
-  Koneked.addCharacteristic(motor3);
-  //scaledValueChar.addDescriptor(mydescriptor1);
-  //scaledValueChar.addDescriptor(mydescriptor2);
-  //scaledValueChar.addDescriptor(mydescriptor3);
-  //Koneked.addCharacteristic(scaledValueChar);
-  BLE.addService(Koneked);
-
-  motor1.writeValue(motorValue);      // start with a zero
-  motor2.writeValue(motorValue);      // start with a zero
-  motor3.writeValue(motorValue);      // start with a zero
-
-  // advertise to the world so we can be found
-  BLE.advertise();
-
-  Serial.println("Bluetooth device active, waiting for connections...");
-
-  // register new connection handler
-  BLE.setEventHandler(BLEConnected, blePeripheralConnectHandler);
-
-  // register disconnect handler
-  BLE.setEventHandler(BLEDisconnected, blePeripheralDisconnectHandler);
-
-  // handle Characteristic Written Handler
-  motor1.setEventHandler(BLEWritten, switchCharacteristicWritten);
-  motor2.setEventHandler(BLEWritten, switchCharacteristicWritten);
-  motor3.setEventHandler(BLEWritten, switchCharacteristicWritten);
 }
 
-void switchCharacteristicWritten(BLEDevice central, BLECharacteristic characteristic) {
-  // central wrote new value to characteristic, see if care, etc.
-  Serial.print("Characteristic event, written: ");
-  Serial.println(characteristic.uuid());
-  byte motorValue1, motorValue2, motorValue3; 
-  // see if this is the Motor Characteristic
-  // Motor 1
-  if (characteristic.uuid() == "2101")
-  {
-    characteristic.readValue(motorValue1);
-    Serial.print("new value ");
-    Serial.println(motorValue1);
-    if (motorValue1 == 0)
-    {
-      Serial.println("Motor 1 on");
-      digitalWrite(MOTOR_1_PIN, HIGH);
-      delay(500);
-      commandIterations++;
-    }
-    digitalWrite(MOTOR_1_PIN, LOW);
+void onRxCharValueUpdate(BLEDevice central, BLECharacteristic characteristic) {
+  // central wrote new value to characteristic, update LED
+  Serial.print("Characteristic event, read: ");
+  byte tmp[256];
+  int dataLength = rxChar.readValue(tmp, 256);
+
+  for(int i = 0; i < dataLength; i++) {
+    Serial.print((char)tmp[i]);
   }
-  // Motor 2
-  if (characteristic.uuid() == "2102")
-  {
-    characteristic.readValue(motorValue2);
-    Serial.print("new value ");
-    Serial.println(motorValue2);
-    if (motorValue2 == 0)
-    {
-      Serial.println("Motor 2  on");
-      digitalWrite(MOTOR_2_PIN, HIGH);
-      delay(500);
-      commandIterations++;
-    }
-    digitalWrite(MOTOR_2_PIN, LOW);
-  }
-  // Motor 3
-  if (characteristic.uuid() == "2103")
-  {
-    characteristic.readValue(motorValue3);
-    Serial.print("new value ");
-    Serial.println(motorValue3);
-    if (motorValue3 == 0)
-    {
-      Serial.println("Motor 3 on");
-      digitalWrite(MOTOR_3_PIN, HIGH);
-      delay(500);
-      commandIterations++;
-    }
-    digitalWrite(MOTOR_3_PIN, LOW);
-  }
+  Serial.println();
+  Serial.print("Value length = ");
+  Serial.println(rxChar.valueLength());
+
+  //TODO: Think of a different logic
+//  // Central wrote new value to characteristic, see if care, etc.
+//  Serial.print("Characteristic event, written: ");
+//  Serial.println(characteristic.uuid());
+//  byte motorValue1, motorValue2, motorValue3;
+//  // see if this is the Motor Characteristic
+//  // Motor 1
+//  if (characteristic.uuid() == "2101")
+//  {
+//    characteristic.readValue(motorValue1);
+//    Serial.print("new value ");
+//    Serial.println(motorValue1);
+//    if (motorValue1 == 0x55)
+//    {
+//      Serial.println("Motor 1 on");
+//      digitalWrite(MOTOR_1_PIN, HIGH);
+//      delay(500);
+//    }
+//    digitalWrite(MOTOR_1_PIN, LOW);
+//  }
+//  // Motor 2
+//  if (characteristic.uuid() == "2102")
+//  {
+//    characteristic.readValue(motorValue2);
+//    Serial.print("new value ");
+//    Serial.println(motorValue2);
+//    if (motorValue2 == 0x55)
+//    {
+//      Serial.println("Motor 2  on");
+//      digitalWrite(MOTOR_2_PIN, HIGH);
+//      delay(500);
+//    }
+//    digitalWrite(MOTOR_2_PIN, LOW);
+//  }
+//  // Motor 3
+//  if (characteristic.uuid() == "2103")
+//  {
+//    characteristic.readValue(motorValue3);
+//    Serial.print("new value ");
+//    Serial.println(motorValue3);
+//    if (motorValue3 == 0x55)
+//    {
+//      Serial.println("Motor 3 on");
+//      digitalWrite(MOTOR_3_PIN, HIGH);
+//      delay(500);
+//    }
+//    digitalWrite(MOTOR_3_PIN, LOW);
+//  }
 }
 
-void blePeripheralConnectHandler(BLEDevice central) {
-  // central connected event handler
+void onBLEConnected(BLEDevice central) {
   Serial.print("Connected event, central: ");
   Serial.println(central.address());
-  digitalWrite(LED_BUILTIN, HIGH);    // indicate that we have a connection
+  connectedLight();
   digitalWrite(MOTOR_1_PIN, LOW);     //  make sure motor is NOT on
   digitalWrite(MOTOR_2_PIN, LOW);     //  make sure motor is NOT on
   digitalWrite(MOTOR_3_PIN, LOW);     //  make sure motor is NOT on
 }
 
-void blePeripheralDisconnectHandler(BLEDevice central) {
-  // central disconnected event handler
+void onBLEDisconnected(BLEDevice central) {
   Serial.print("Disconnected event, central: ");
   Serial.println(central.address());
-  digitalWrite(LED_BUILTIN, LOW);     // indicate that we no longer have a connection
+  disconnectedLight();
   digitalWrite(MOTOR_1_PIN, LOW);     //  make sure motor is NOT on
   digitalWrite(MOTOR_2_PIN, LOW);     //  make sure motor is NOT on
   digitalWrite(MOTOR_3_PIN, LOW);     //  make sure motor is NOT on
 }
 
+/*
+ * LEDS
+ */
+void connectedLight() {
+  digitalWrite(LEDR, LOW);
+  digitalWrite(LEDG, HIGH);
+}
 
-void loop()
-{
-  BLEDevice central = BLE.central();
 
-  if (central)
-  {
-    while (central.connected()) {
+void disconnectedLight() {
+  digitalWrite(LEDR, HIGH);
+  digitalWrite(LEDG, LOW);
+}
 
-      int battery = analogRead(A0);
-      int batteryLevel = map(battery, 0, 1023, 0, 100);
-      //Serial.print("Battery Level % is now: ");
-      //Serial.println(batteryLevel);
-      //batteryLevelChar.writeValue(batteryLevel);
-      //scaledValueChar.writeValue(something * 5);
-      delay(200);
-    }
+/*
+ *  MICROPHONE
+ */
+void startPDM() {
+  // initialize PDM with:
+  // - one channel (mono mode)
+  // - a 16 kHz sample rate
+  if (!PDM.begin(1, 16000)) {
+    Serial.println("Failed to start PDM!");
+    while (1);
   }
+}
+
+void onPDMdata() {
+  // Query the number of bytes available
+  int bytesAvailable = PDM.available();
+
+  // Read into the sample buffer
+  int bytesRead = PDM.read(sampleBuffer, bytesAvailable);
+
+  // 16-bit, 2 bytes per sample
+  samplesRead = bytesRead / 2;
 }
