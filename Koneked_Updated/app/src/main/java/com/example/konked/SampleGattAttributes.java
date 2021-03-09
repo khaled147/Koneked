@@ -1,5 +1,3 @@
-// TODO: Rethink about this
-
 package com.example.konked;
 
 import java.util.HashMap;

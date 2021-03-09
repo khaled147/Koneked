@@ -1,3 +1,5 @@
+//TODO: Implement Error Handling
+
 package com.example.konked;
 
 import android.app.Service;

@@ -11,7 +11,7 @@
     <string name="found_device">You have located the Koneked Device</string>
 
     <string name="streaming">Streaming</string>
-    <string name="motor_setup_error">Motor is not set up yet.\nPlease toggle motor switch off and tap it.</string>
+    <string name="motor_setup_error">Motor is not set up yet.\nPlease tap again.</string>
 
     <string name="location_prompt">Please grant location permission to use this app</string>
     <string name="location_confirmation">Location permission granted</string>
