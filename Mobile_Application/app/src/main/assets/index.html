@@ -22,12 +22,15 @@ function goopen() {
     document.getElementById('arduino').class='notconnected';
     window.bleui.toggleMotor();
 }
+function close() {
+    document.getElementById('arduino').class='notconnected';
+    window.bleui.disconnect();
+}
 function setClassOnArduino(c) {
     document.getElementById('arduino').className = c;
 }
 function setStatus(s) {
     document.getElementById('status').innerHTML = s;
-
 }
 </script>
 <style>
@@ -54,6 +57,8 @@ function setStatus(s) {
     <br>
     <button onclick="go();">Connect Device</button>
     <button onclick="goopen();">Test the Motor</button>
+    <br>
+    <button onclick="close();">Test the Motor</button>
 </center>
 </body>
 </html>

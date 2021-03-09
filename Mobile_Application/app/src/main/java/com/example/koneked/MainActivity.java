@@ -1,5 +1,6 @@
 //TODO: Implement a method to not require manual toggling of location permissions
 //TODO: Implement activity overlay instead of browser overlay
+//TODO: Check out https://github.com/Fakher-Hakim/android-BluetoothLeGatt
 
 package com.example.koneked;
 
@@ -18,10 +19,8 @@ import android.webkit.*;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
     private Handler mHandler = null;
@@ -158,15 +157,24 @@ public class MainActivity extends AppCompatActivity {
             mHandler.sendEmptyMessage(SEARCHING);
             bluetoothAdapter.getBluetoothLeScanner().startScan(new BLEFoundDevice(TESTING_MOTOR));
         }
+
+        @JavascriptInterface
+        public void disconnect() {
+            Log.i("BLEUIHandler", "Disconnecting");
+            mHandler.sendEmptyMessage(DISCONNECTING);
+            BluetoothDevice device = bluetoothAdapter.getRemoteDevice("24:08:78:9b:35:b4");
+        }
     }
 
 
     final class BLERemoteDevice extends BluetoothGattCallback {
         private final String tag = "BLEDEVICE";
-        UUID serviceWeWant = new UUID(0x0000FA0100001000L,0x800000805f9b34fbL);
-        UUID toggleButtonUUID = new UUID(0x0000210200001000L ,0x800000805f9b34fbL);
+        UUID serviceWeWant = new UUID(0x0000AA0100001000L,0x800000805f9b34fbL);
+        UUID toggleMotor1UUID = new UUID(0x0000210100001000L ,0x800000805f9b34fbL);
+        UUID toggleMotor2UUID = new UUID(0x0000210200001000L ,0x800000805f9b34fbL);
+        UUID toggleMotor3UUID = new UUID(0x0000210300001000L ,0x800000805f9b34fbL);
 
-        byte toggleDoorValue[] = {0x55};
+        byte toggleMotorValue[] = {0x55};
         Queue<BLEQueueItem> taskQ = new LinkedList<BLEQueueItem>();
         private int mode = INTERROGATE;
 
@@ -195,10 +203,10 @@ public class MainActivity extends AppCompatActivity {
                         case BLEQueueItem.READDESCRIPTOR:
                             gatt.readDescriptor((BluetoothGattDescriptor) thisTask.getObject());
                             break;
-//                        case BLEQueueItem.DISCONNECT:
-//                            mHandler.sendEmptyMessage(DISCONNECTING);
-//                            gatt.disconnect();
-//                            break;
+                        case BLEQueueItem.DISCONNECT:
+                            mHandler.sendEmptyMessage(DISCONNECTING);
+                            gatt.disconnect();
+                            break;
                     }
                 } else {
                     Log.i(tag,"Mo more tasks");
@@ -253,28 +261,49 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-
-            if (mode == TESTING_MOTOR) {
-                BluetoothGattService garageDoorOpener = gatt.getService(serviceWeWant);
-                if (garageDoorOpener != null) {
+            else if (mode == TESTING_MOTOR) {
+                BluetoothGattService testMotors = gatt.getService(serviceWeWant);
+                if (testMotors != null) {
                     Log.i(tag, "Got it, woo hoo!!!");
-                    BluetoothGattCharacteristic toggleDoor = garageDoorOpener.getCharacteristic(toggleButtonUUID);
-                    if (toggleDoor != null) {
-                        Log.i(tag, "Got the button");
-                        Log.i(tag, "value is [" + toggleDoor.getStringValue(0) + "]");
-                        toggleDoor.setValue(toggleDoorValue);
-                        Log.i(tag, "value is [" + toggleDoor.getStringValue(0) + "]");
-                        taskQ.add(new BLEQueueItem(BLEQueueItem.WRITECHARACTERISTIC, toggleDoor.getUuid(), "Write Characteristic to Toggle Door", toggleDoor));
+                    BluetoothGattCharacteristic motor1 = testMotors.getCharacteristic(toggleMotor1UUID);
+                    BluetoothGattCharacteristic motor2 = testMotors.getCharacteristic(toggleMotor2UUID);
+                    BluetoothGattCharacteristic motor3 = testMotors.getCharacteristic(toggleMotor3UUID);
+                    if (motor1 != null) {
+                        Log.i(tag, "Got the motor");
+                        Log.i(tag, "value is [" + motor1.getStringValue(0) + "]");
+                        motor1.setValue(toggleMotorValue);
+                        Log.i(tag, "value is [" + motor1.getStringValue(0) + "]");
+                        taskQ.add(new BLEQueueItem(BLEQueueItem.WRITECHARACTERISTIC, motor1.getUuid(), "Write Characteristic to Toggle Motor", motor1));
                         //gatt.writeCharacteristic(toggleDoor);
                     } else {
-                        Log.i(tag, "No button");
+                        Log.i(tag, "No motor");
+                    }
+                    if (motor2 != null) {
+                        Log.i(tag, "Got the motor");
+                        Log.i(tag, "value is [" + motor2.getStringValue(0) + "]");
+                        motor2.setValue(toggleMotorValue);
+                        Log.i(tag, "value is [" + motor2.getStringValue(0) + "]");
+                        taskQ.add(new BLEQueueItem(BLEQueueItem.WRITECHARACTERISTIC, motor2.getUuid(), "Write Characteristic to Toggle Motor", motor2));
+                        //gatt.writeCharacteristic(toggleDoor);
+                    } else {
+                        Log.i(tag, "No motor");
+                    }
+                    if (motor3 != null) {
+                        Log.i(tag, "Got the motor");
+                        Log.i(tag, "value is [" + motor3.getStringValue(0) + "]");
+                        motor3.setValue(toggleMotorValue);
+                        Log.i(tag, "value is [" + motor3.getStringValue(0) + "]");
+                        taskQ.add(new BLEQueueItem(BLEQueueItem.WRITECHARACTERISTIC, motor3.getUuid(), "Write Characteristic to Toggle Motor", motor3));
+                        //gatt.writeCharacteristic(toggleDoor);
+                    } else {
+                        Log.i(tag, "No motor");
                     }
                 } else {
                     Log.i(tag, "No Service");
                 }
             }
             Log.i(tag, "OK, let's go^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-            taskQ.add(new BLEQueueItem(BLEQueueItem.DISCONNECT, new UUID(0, 0), "Disconnect", null));
+//            taskQ.add(new BLEQueueItem(BLEQueueItem.DISCONNECT, new UUID(0, 0), "Disconnect", null));
             mHandler.sendEmptyMessage(COMMUNICATING);
             doNextThing(gatt);
         }
@@ -282,7 +311,19 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCharacteristicWrite (BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             Log.i(tag,"characteristic written [" + status + "]");
-            if (characteristic.getUuid().equals(toggleButtonUUID)) {
+            if (characteristic.getUuid().equals(toggleMotor1UUID)) {
+                Log.i(tag,"value is [" + characteristic.getStringValue(0) + "]");
+                if (characteristic.getStringValue(0).equals(("U"))) {
+                    Log.i(tag,"We're done here!");
+                }
+            }
+            if (characteristic.getUuid().equals(toggleMotor2UUID)) {
+                Log.i(tag,"value is [" + characteristic.getStringValue(0) + "]");
+                if (characteristic.getStringValue(0).equals(("U"))) {
+                    Log.i(tag,"We're done here!");
+                }
+            }
+            if (characteristic.getUuid().equals(toggleMotor3UUID)) {
                 Log.i(tag,"value is [" + characteristic.getStringValue(0) + "]");
                 if (characteristic.getStringValue(0).equals(("U"))) {
                     Log.i(tag,"We're done here!");
@@ -307,10 +348,10 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Log.i(tag,"onDescriptorRead status is [" + status + "]");
                 Log.i(tag, "descriptor read [" + descriptor.getCharacteristic().getUuid() + "]");
-                Log.i(tag, "descriptor value is [" + new String(descriptor.getValue(), "UTF-8") + "]");
+                Log.i(tag, "descriptor value is [" + new String(descriptor.getValue(), StandardCharsets.UTF_8) + "]");
                 doNextThing(gatt);
             } catch (Exception e) {
-                Log.e(tag,"Error reading descriptor " + e.getStackTrace());
+                Log.e(tag,"Error reading descriptor " + Arrays.toString(e.getStackTrace()));
                 doNextThing(gatt);
             }
         }
@@ -328,10 +369,10 @@ public class MainActivity extends AppCompatActivity {
             ScanRecord sr = result.getScanRecord();
             if (sr!= null) {
                 if (sr.getDeviceName() != null) {
-                    if (sr.getDeviceName().equals("BLE Garage Opener")) {
+                    if (sr.getDeviceName().equals("BLE Koneked Device")) {
                         bluetoothAdapter.getBluetoothLeScanner().stopScan(this);
                         mHandler.sendEmptyMessage(FOUND);
-                        Log.i(tag, "Found our Garage Door Opener!");
+                        Log.i(tag, "Found our Koneked Device!");
                         BluetoothDevice remoteDevice = result.getDevice();
                         if (remoteDevice != null) {
                             String nameOfDevice = result.getDevice().getName();

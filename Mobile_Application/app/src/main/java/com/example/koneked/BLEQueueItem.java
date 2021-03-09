@@ -14,7 +14,7 @@ public class BLEQueueItem {
 
 
 
-    BLEQueueItem(int action,UUID uuid,String comment,Object object) {
+    BLEQueueItem(int action, UUID uuid, String comment, Object object) {
         Log.i(tag,"Adding new Queue Item " + comment + " [" + action + "] " + comment);
         this.action= action;
         this.uuid = uuid;
