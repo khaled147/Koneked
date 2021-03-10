@@ -1,4 +1,5 @@
 // Implemented from https://developer.ibm.com/technologies/iot/tutorials/build-connected-devices-using-ble-apis/
+// TODO: Implement PDM to PCM to WAV conversion of audio input
 
 #include <ArduinoBLE.h>
 #include <PDM.h>
