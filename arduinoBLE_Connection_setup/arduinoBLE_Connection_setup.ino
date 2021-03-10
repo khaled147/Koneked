@@ -31,7 +31,7 @@ void setup() {
   // Start serial
   Serial.begin(9600);
   //Ensure serial port is ready
-  while (!Serial);
+  //while (!Serial);
 
   // Prepare LED pins
   pinMode(LED_BUILTIN, OUTPUT);
@@ -107,7 +107,6 @@ void loop()
         // print samples to the serial monitor or plotter
         for (int i = 0; i < samplesRead; i++) {
           txChar.writeValue(sampleBuffer[i]);
-          Serial.println(sampleBuffer[i]);
         }
         // Clear the read count
         samplesRead = 0;
@@ -143,54 +142,22 @@ void onRxCharValueUpdate(BLEDevice central, BLECharacteristic characteristic) {
   Serial.print("Value length = ");
   Serial.println(rxChar.valueLength());
 
-  //TODO: Think of a different logic
-//  // Central wrote new value to characteristic, see if care, etc.
-//  Serial.print("Characteristic event, written: ");
-//  Serial.println(characteristic.uuid());
-//  byte motorValue1, motorValue2, motorValue3;
-//  // see if this is the Motor Characteristic
-//  // Motor 1
-//  if (characteristic.uuid() == "2101")
-//  {
-//    characteristic.readValue(motorValue1);
-//    Serial.print("new value ");
-//    Serial.println(motorValue1);
-//    if (motorValue1 == 0x55)
-//    {
-//      Serial.println("Motor 1 on");
-//      digitalWrite(MOTOR_1_PIN, HIGH);
-//      delay(500);
-//    }
-//    digitalWrite(MOTOR_1_PIN, LOW);
-//  }
-//  // Motor 2
-//  if (characteristic.uuid() == "2102")
-//  {
-//    characteristic.readValue(motorValue2);
-//    Serial.print("new value ");
-//    Serial.println(motorValue2);
-//    if (motorValue2 == 0x55)
-//    {
-//      Serial.println("Motor 2  on");
-//      digitalWrite(MOTOR_2_PIN, HIGH);
-//      delay(500);
-//    }
-//    digitalWrite(MOTOR_2_PIN, LOW);
-//  }
-//  // Motor 3
-//  if (characteristic.uuid() == "2103")
-//  {
-//    characteristic.readValue(motorValue3);
-//    Serial.print("new value ");
-//    Serial.println(motorValue3);
-//    if (motorValue3 == 0x55)
-//    {
-//      Serial.println("Motor 3 on");
-//      digitalWrite(MOTOR_3_PIN, HIGH);
-//      delay(500);
-//    }
-//    digitalWrite(MOTOR_3_PIN, LOW);
-//  }
+  if (Serial.print((char)tmp[0]) == 'U') {
+    digitalWrite(MOTOR_1_PIN, HIGH);     //  make sure motor is on
+    Serial.println("Motor 1 On");
+    delay(500);
+    digitalWrite(MOTOR_1_PIN, LOW);     //  make sure motor is NOT on
+    
+    digitalWrite(MOTOR_2_PIN, HIGH);     //  make sure motor is on
+    Serial.println("Motor 2 On");
+    delay(500);
+    digitalWrite(MOTOR_2_PIN, LOW);     //  make sure motor is NOT on
+    
+    digitalWrite(MOTOR_3_PIN, HIGH);     //  make sure motor is on
+    Serial.println("Motor 3 On");
+    delay(500);
+    digitalWrite(MOTOR_3_PIN, LOW);     //  make sure motor is NOT on
+  }
 }
 
 void onBLEConnected(BLEDevice central) {
