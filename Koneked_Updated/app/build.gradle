@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.chaquo.python'
 
 android {
     compileSdkVersion 29
@@ -12,6 +13,21 @@ android {
         versionName "4.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        python {
+            // If Chaquopy fails to find Python on your build machine, enable the following
+            // line and edit it to point to Python 3.5 or later.
+            // You can find where python is located in your computer using:
+            //   --> python -c "import os, sys; print(os.path.dirname(sys.executable))"
+            buildPython "C:/Users/elmal/AppData/Local/Programs/Python/Python38-32/python.exe"
+            pip {
+                // A pip requirement specifier
+                install "SpeechRecognition"
+                //install "pyaudio"
+            }
+        }
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
     }
 
     buildTypes {

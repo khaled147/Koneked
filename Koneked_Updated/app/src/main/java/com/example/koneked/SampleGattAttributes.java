@@ -1,4 +1,4 @@
-package com.example.konked;
+package com.example.koneked;
 
 import java.util.HashMap;
 

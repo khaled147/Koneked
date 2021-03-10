@@ -1,6 +1,7 @@
 //TODO: Implement Error Handling
+// Implement Python and Java together: https://chaquo.com/chaquopy/doc/current/android.html
 
-package com.example.konked;
+package com.example.koneked;
 
 import android.app.Service;
 import android.bluetooth.*;

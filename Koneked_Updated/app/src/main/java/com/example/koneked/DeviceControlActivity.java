@@ -1,4 +1,4 @@
-package com.example.konked;
+package com.example.koneked;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothGattCharacteristic;
