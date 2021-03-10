@@ -7,14 +7,14 @@ import java.util.HashMap;
  */
 public class SampleGattAttributes {
     private static final HashMap<String, String> attributes = new HashMap();
-    public static String MICROPHONE_SERVICE = "0000181a-0000-1000-8000-00805f9b34fb";
+    public static String MICROPHONE_AND_MOTOR_SERVICE = "0000181a-0000-1000-8000-00805f9b34fb";
     public static String TRANSMITTER_CHARACTERISTIC = "00002a58-0000-1000-8000-00805f9b34fb";
     public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
 
     static {
         // Sample Services.
         attributes.put("00001800-0000-1000-8000-00805f9b34fb", "Generic Access Profile");
-        attributes.put(MICROPHONE_SERVICE, "Microphone Service");
+        attributes.put(MICROPHONE_AND_MOTOR_SERVICE, "Microphone and Motor Service");
         // Sample Characteristics.
         attributes.put("00002a00-0000-1000-8000-00805f9b34fb", "Device Name");
         attributes.put("00002a01-0000-1000-8000-00805f9b34fb", "Appearance");

@@ -77,6 +77,6 @@
                 android:nestedScrollingEnabled="true"
                 android:id="@+id/gatt_services_list"
                 android:layout_width="match_parent"
-                android:layout_height="3000sp"/>
+                android:layout_height="300sp"/>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
