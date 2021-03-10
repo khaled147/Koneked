@@ -193,6 +193,7 @@ def cha_to_vib(x):
 
 def main(audio):
     r = s_r.Recognizer()
+    # Implements Google Web Speech API
     test = r.recognize_google(audio)
     return test #to print voice into text
 
