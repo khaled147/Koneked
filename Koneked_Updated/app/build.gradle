@@ -22,7 +22,6 @@ android {
             pip {
                 // A pip requirement specifier
                 install "SpeechRecognition"
-                //install "pyaudio"
             }
         }
         ndk {

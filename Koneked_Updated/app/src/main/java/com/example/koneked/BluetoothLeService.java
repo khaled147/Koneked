@@ -10,6 +10,9 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+import com.chaquo.python.android.AndroidPlatform;
 
 import java.util.List;
 import java.util.UUID;
@@ -90,6 +93,10 @@ public class BluetoothLeService extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+            if(!Python.isStarted()) {
+                Log.e(TAG, "onCharacteristicChanged: Python Started");
+                Python.start(new AndroidPlatform(BluetoothLeService.this));
+            }
         }
     };
 
@@ -108,6 +115,15 @@ public class BluetoothLeService extends Service {
                     StringBuilder append = stringBuilder.append(String.format("%d", byteChar));
                 }
                 intent.putExtra(EXTRA_DATA, stringBuilder.toString());
+                if(Python.isStarted()) {
+                    // Create Python instance
+                    final Python py = Python.getInstance();
+                    // Create Python Object and load script
+                    PyObject pyo = py.getModule("vibration_language_system");
+                    // Call main function in python file
+                    //PyObject obj = pyo.callAttr("main", Integer.parseInt(stringBuilder.toString()));
+                    //Log.e(TAG, "broadcastUpdate: " + obj.toString());
+                }
             } else {
                 // For all other profiles, writes the data formatted in HEX.
                 final StringBuilder stringBuilder = new StringBuilder(data.length);

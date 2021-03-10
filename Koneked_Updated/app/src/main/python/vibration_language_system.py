@@ -1,3 +1,7 @@
+# NOTE: Do not need PyAudio library
+# Resource: https://realpython.com/python-speech-recognition/#working-with-audio-files
+# TODO: Convert audio data from arduino to wav source file to send to main
+
 import speech_recognition as s_r
 
 dit = 1000
@@ -185,19 +189,22 @@ def cha_to_vib(x):
         vib2 = dah
         vib2 = dah
         vib3 = dit
-    print(vib1, vib2, vib3, x)
+ #   print(vib1, vib2, vib3, x)
 
-r = s_r.Recognizer()
-my_mic = s_r.Microphone(device_index=1) #my device index is 1, you have to put your device index
-with my_mic as source:
-    print("Say now!!!!")
-    r.adjust_for_ambient_noise(source) #reduce noise
-    audio = r.listen(source) #take voice input from the microphone
-test = r.recognize_google(audio)
-print(test) #to print voice into text
+def main(audio):
+    r = s_r.Recognizer()
+    test = r.recognize_google(audio)
+    return test #to print voice into text
 
-for cha in test:
-    cha_to_vib(cha)
+#for cha in test:
+#    cha_to_vib(cha)
+
+
+#my_mic = s_r.Microphone(device_index=1) #my device index is 1, you have to put your device index
+#with my_mic as source:
+#    print("Say now!!!!")
+#    r.adjust_for_ambient_noise(source) #reduce noise
+#    audio = r.listen(source) #take voice input from the microphone
 
 #f = open("test.txt", 'rt')
 #lines = f.readlines()
