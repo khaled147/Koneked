@@ -22,6 +22,7 @@ android {
             pip {
                 // A pip requirement specifier
                 install "SpeechRecognition"
+                install "wave"
             }
         }
         ndk {

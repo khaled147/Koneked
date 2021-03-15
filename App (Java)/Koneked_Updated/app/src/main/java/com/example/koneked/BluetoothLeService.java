@@ -34,6 +34,10 @@ public class BluetoothLeService extends Service {
             "com.example.bluetooth.le.EXTRA_DATA";
     public final static UUID UUID_TRANSMITTER_CHARACTERISTIC =
             UUID.fromString(SampleGattAttributes.TRANSMITTER_CHARACTERISTIC);
+    public final static UUID UUID_RECEIVER_CHARACTERISTIC =
+            UUID.fromString(SampleGattAttributes.RECEIVER_CHARACTERISTIC);
+    public final static UUID UUID_MICROPHONE_AND_MOTOR_SERVICE =
+            UUID.fromString(SampleGattAttributes.MICROPHONE_AND_MOTOR_SERVICE);
     private final static String TAG = BluetoothLeService.class.getSimpleName();
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
@@ -44,6 +48,11 @@ public class BluetoothLeService extends Service {
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
+    private PyObject pyo;
+    private int audioDataCounter = 0;
+    // Every data is processed at 0.016 seconds so the following allows to "wait" for 1.6 seconds
+    private int arrayLength = 256 * 10;
+    private int[] audioDataArray = new int[arrayLength];
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
@@ -94,8 +103,12 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
             if(!Python.isStarted()) {
-                Log.e(TAG, "onCharacteristicChanged: Python Started");
+                Log.i(TAG, "onCharacteristicChanged: Python Started");
                 Python.start(new AndroidPlatform(BluetoothLeService.this));
+                // Create Python instance
+                final Python py = Python.getInstance();
+                // Create Python Object and load script
+                pyo = py.getModule("vibration_language_system");
             }
         }
     };
@@ -116,13 +129,16 @@ public class BluetoothLeService extends Service {
                 }
                 intent.putExtra(EXTRA_DATA, stringBuilder.toString());
                 if(Python.isStarted()) {
-                    // Create Python instance
-                    final Python py = Python.getInstance();
-                    // Create Python Object and load script
-                    PyObject pyo = py.getModule("vibration_language_system");
-                    // Call main function in python file
-                    //PyObject obj = pyo.callAttr("main", Integer.parseInt(stringBuilder.toString()));
-                    //Log.e(TAG, "broadcastUpdate: " + obj.toString());
+                    if(audioDataCounter >= 256 * 10) {
+                        // Call main function in python file
+                        PyObject obj = pyo.callAttr("main", audioDataArray);
+                        Log.e(TAG, "broadcastUpdate: Testing");
+                        audioDataCounter = 0;
+                    } else {
+                        audioDataArray[audioDataCounter] = Integer.parseInt(stringBuilder.toString());
+                    }
+                    audioDataCounter++;
+                    Log.e(TAG, "broadcastUpdate: " + audioDataCounter);
                 }
             } else {
                 // For all other profiles, writes the data formatted in HEX.

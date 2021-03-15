@@ -191,11 +191,29 @@ def cha_to_vib(x):
         vib3 = dit
  #   print(vib1, vib2, vib3, x)
 
-def main(audio):
-    r = s_r.Recognizer()
+def main(stream):
+    CHUNK = 4096
+    CHANNELS = 1
+    RATE = 16000
+    RECORD_SECONDS = 1
+    WAVE_OUTPUT_FILENAME = "test.wav"
+
+    frames = []
+    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+        data = stream.read(CHUNK)
+        print(data)
+        frames.append(data)
+
+    wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+    wf.setnchannels(CHANNELS)
+    wf.setframerate(RATE)
+    wf.writeframes(b''.join(frames))
+    wf.close()
+    return wf
+    # = s_r.Recognizer()
     # Implements Google Web Speech API
-    test = r.recognize_google(audio)
-    return test #to print voice into text
+    #test = r.recognize_google(audio)
+    #return test #to print voice into text
 
 #for cha in test:
 #    cha_to_vib(cha)

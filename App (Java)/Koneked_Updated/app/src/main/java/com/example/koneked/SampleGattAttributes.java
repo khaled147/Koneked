@@ -9,6 +9,7 @@ public class SampleGattAttributes {
     private static final HashMap<String, String> attributes = new HashMap();
     public static String MICROPHONE_AND_MOTOR_SERVICE = "0000181a-0000-1000-8000-00805f9b34fb";
     public static String TRANSMITTER_CHARACTERISTIC = "00002a58-0000-1000-8000-00805f9b34fb";
+    public static String RECEIVER_CHARACTERISTIC = "00002a3d-0000-1000-8000-00805f9b34fb";
     public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
 
     static {
@@ -18,7 +19,7 @@ public class SampleGattAttributes {
         // Sample Characteristics.
         attributes.put("00002a00-0000-1000-8000-00805f9b34fb", "Device Name");
         attributes.put("00002a01-0000-1000-8000-00805f9b34fb", "Appearance");
-        attributes.put("00002a3d-0000-1000-8000-00805f9b34fb", "Receiver Characteristic");
+        attributes.put(RECEIVER_CHARACTERISTIC, "Receiver Characteristic");
         attributes.put(TRANSMITTER_CHARACTERISTIC, "Transmitter Characteristic");
     }
 
