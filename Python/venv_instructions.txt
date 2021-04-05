@@ -1,0 +1,13 @@
+Follow the following links to set up the python virtual environment:
+
+#Tutorial:
+https://medium.com/@MrMaran/speech-to-text-prediction-preambling-of-deepspeech-models-d8a8581aac47#:~:text=%E2%80%9CDeepSpeech%20is%20an%20open%20source,to%20make%20the%20implementation%20easier.%E2%80%9D
+
+#To install packages and set up python environment on Windows:
+https://packaging.python.org/tutorials/installing-packages/
+
+#To install pyAudio on Windows:
+https://stackoverflow.com/questions/53866104/pyaudio-failed-to-install-windows-10/53866322
+
+#deepspeech releases:
+https://github.com/mozilla/DeepSpeech/releases/
