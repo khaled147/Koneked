@@ -125,7 +125,7 @@ public class BluetoothLeService extends Service {
             if (UUID_TRANSMITTER_CHARACTERISTIC.equals(characteristic.getUuid())) {
                 final StringBuilder stringBuilder = new StringBuilder(data.length);
                 for (byte byteChar : data) {
-                    StringBuilder append = stringBuilder.append(String.format("%d", byteChar));
+                    stringBuilder.append(String.format("%d", byteChar));
                 }
                 intent.putExtra(EXTRA_DATA, stringBuilder.toString());
                 if(Python.isStarted()) {
