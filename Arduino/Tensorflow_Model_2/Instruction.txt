@@ -1,0 +1,2 @@
+Follow the folowing link:
+https://eloquentarduino.github.io/2020/08/better-word-classification-with-arduino-33-ble-sense-and-machine-learning/
