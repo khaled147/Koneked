@@ -1,0 +1,2 @@
+Follow the folowing link:
+https://create.arduino.cc/projecthub/alankrantas/eloquenttinyml-easier-voice-classifier-on-nano-33-ble-sense-ebb81e
