@@ -1,5 +1,7 @@
 // Implemented from https://developer.ibm.com/technologies/iot/tutorials/build-connected-devices-using-ble-apis/
-// TODO: Implement PDM to PCM to WAV conversion of audio input
+// TODO: Implement PDM to PCM (know as decimation) to WAV conversions of audio input
+// https://create.arduino.cc/projecthub/voske65/arduino-zero-pdm-microphone-9136cb?ref=tag&ref_id=microphone&offset=5
+// Maybe consider using circuit python
 
 #include <ArduinoBLE.h>
 #include <PDM.h>
@@ -107,6 +109,7 @@ void loop()
       if (samplesRead) {
         // print samples to the serial monitor or plotter
         for (int i = 0; i < samplesRead; i++) {
+          Serial.print(sampleBuffer[i]);
           txChar.writeValue(sampleBuffer[i]);
         }
         // Clear the read count
