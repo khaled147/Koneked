@@ -19,7 +19,7 @@ Project for ENEL 400 at the University of Calgary
  	- Located in the Python folder
  	- Language: Uses online APIs - currently working with the Microsoft Bing Voice Recognition (https://pypi.org/project/SpeechRecognition/)
  	- Offline_SST: Uses offline API - currently working with Mozilla DeepSpeech (https://github.com/mozilla/DeepSpeech)
- 	- **Issue:** Both Require WAV file --> **Solution:** Buy a microphone wired to the Arduino (https://www.youtube.com/watch?v=7Hn4UFi9wvs&ab_channel=GreatScott%21)
+ 	- **Issue:** Both Require WAV file --> **Solution:** Buy a microphone wired to the Arduino (https://www.instructables.com/Make-Your-Own-Spy-Bug-Arduino-Voice-Recorder/)
     
 **Features:**
 
