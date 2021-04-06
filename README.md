@@ -15,7 +15,7 @@ Project for ENEL 400 at the University of Calgary
  	- 1st Model Resource: https://create.arduino.cc/projecthub/alankrantas/eloquenttinyml-easier-voice-classifier-on-nano-33-ble-sense-ebb81e
  	- 2nd Model Resource: https://eloquentarduino.github.io/2020/08/better-word-classification-with-arduino-33-ble-sense-and-machine-learning/
  	- Both are located in the Arduino folder
-3. Implemented SST using python - Notes:
+3. Implemented STT using python - Notes:
  	- Located in the Python folder
  	- Language: Uses online APIs - currently working with the Microsoft Bing Voice Recognition (https://pypi.org/project/SpeechRecognition/)
  	- Offline_SST: Uses offline API - currently working with Mozilla DeepSpeech (https://github.com/mozilla/DeepSpeech)
