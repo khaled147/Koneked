@@ -24,6 +24,7 @@ Project for ENEL 400 at the University of Calgary
 **Features:**
 
 Virtual Python Environment:
+ - Located in the Python folder
  - Installed with required libraries to run all python scripts in this repository
  - https://packaging.python.org/tutorials/installing-packages/
 
