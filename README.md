@@ -20,6 +20,10 @@ Project for ENEL 400 at the University of Calgary
  	- Language: Uses online APIs - currently working with the Microsoft Bing Voice Recognition (https://pypi.org/project/SpeechRecognition/)
  	- Offline_SST: Uses offline API - currently working with Mozilla DeepSpeech (https://github.com/mozilla/DeepSpeech)
  	- **Issue:** Both Require WAV file --> **Solution:** Buy a microphone wired to the Arduino (https://www.instructables.com/Make-Your-Own-Spy-Bug-Arduino-Voice-Recorder/)
+4. Battery Operation (4.5V to 21 V):
+ 	- Brock open portable charger
+ 	- Button battery (https://forum.arduino.cc/index.php?topic=657082.0)
+ 	- LiPo Battery (https://www.hackster.io/ebaera/nano-33-lipo-adapter-nano9jira-6e78a1)
     
 **Features:**
 
