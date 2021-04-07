@@ -1,7 +1,7 @@
 // Implemented from https://developer.ibm.com/technologies/iot/tutorials/build-connected-devices-using-ble-apis/
 // TODO: Implement PDM to PCM (know as decimation) to WAV conversions of audio input
 // https://create.arduino.cc/projecthub/voske65/arduino-zero-pdm-microphone-9136cb?ref=tag&ref_id=microphone&offset=5
-// Maybe consider using circuit python
+// Maybe consider using micropython
 
 #include <ArduinoBLE.h>
 #include <PDM.h>
@@ -91,7 +91,7 @@ void setup() {
   Serial.println(txChar.uuid());
 
   Serial.println("Bluetooth device active, waiting for connections...");;
-  
+
   // Advertise to the world so device can be found
   BLE.advertise();
 }
@@ -123,8 +123,8 @@ void loop()
 }
 
 /*
- *  BLUETOOTH
- */
+    BLUETOOTH
+*/
 void startBLE() {
   if (!BLE.begin())
   {
@@ -139,7 +139,7 @@ void onRxCharValueUpdate(BLEDevice central, BLECharacteristic characteristic) {
   byte tmp[256];
   int dataLength = rxChar.readValue(tmp, 256);
 
-  for(int i = 0; i < dataLength; i++) {
+  for (int i = 0; i < dataLength; i++) {
     Serial.print((char)tmp[i]);
   }
   Serial.println();
@@ -151,12 +151,12 @@ void onRxCharValueUpdate(BLEDevice central, BLECharacteristic characteristic) {
     Serial.println("Motor 1 On");
     delay(500);
     digitalWrite(MOTOR_1_PIN, LOW);     //  make sure motor is NOT on
-    
+
     digitalWrite(MOTOR_2_PIN, HIGH);     //  make sure motor is on
     Serial.println("Motor 2 On");
     delay(500);
     digitalWrite(MOTOR_2_PIN, LOW);     //  make sure motor is NOT on
-    
+
     digitalWrite(MOTOR_3_PIN, HIGH);     //  make sure motor is on
     Serial.println("Motor 3 On");
     delay(500);
@@ -183,8 +183,8 @@ void onBLEDisconnected(BLEDevice central) {
 }
 
 /*
- * LEDS
- */
+   LEDS
+*/
 void connectedLight() {
   digitalWrite(LEDR, LOW);
   digitalWrite(LEDG, HIGH);
@@ -197,8 +197,8 @@ void disconnectedLight() {
 }
 
 /*
- *  MICROPHONE
- */
+    MICROPHONE
+*/
 void startPDM() {
   // initialize PDM with:
   // - one channel (mono mode)
