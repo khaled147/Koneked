@@ -110,6 +110,9 @@ void loop()
         // print samples to the serial monitor or plotter
         for (int i = 0; i < samplesRead; i++) {
           Serial.print(sampleBuffer[i]);
+          //Apply FFT
+          // Apply LPF
+          // Reverse FFT
           txChar.writeValue(sampleBuffer[i]);
         }
         // Clear the read count
