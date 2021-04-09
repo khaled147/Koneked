@@ -30,6 +30,8 @@ Project for ENEL 400 at the University of Calgary
  	- Broke open portable charger
  	- Button battery (https://forum.arduino.cc/index.php?topic=657082.0)
  	- LiPo Battery (https://www.hackster.io/ebaera/nano-33-lipo-adapter-nano9jira-6e78a1)
+7. I/O pins produce 0.7 mA but require ~~80mA~~ (around 50-60 mA after testing on my ammeter)
+ 	- Design a transistor switch with SN8050 or PN2222 with the 3.3 output switch on the Nano BLE 33 sense
     
 **Features:**
 
