@@ -10,6 +10,7 @@ Project for ENEL 400 at the University of Calgary
  	- Audio recording with Arduino seems to be a pain (https://forum.arduino.cc/index.php?topic=561135.0)
  	- Located in the Arduino folder
  	- **New Idea to Try Out:** Use AutoAnalogAudio by TMRh20 (https://github.com/TMRh20/AutoAnalogAudio)
+ 	- **Another Idea to Try Out:** Determine how to use the ArduinoSound library
 2.  Implemented 2 Tensorflow models for STT - Notes:
  	- Works offline
  	- Very low accurracy
@@ -23,7 +24,7 @@ Project for ENEL 400 at the University of Calgary
  	- **Issue:** Both Require WAV file --> ~~**Solution:** Buy a microphone wired to the Arduino (https://www.instructables.com/Make-Your-Own-Spy-Bug-Arduino-Voice-Recorder/)~~ (Did not work as TMRpcm only works on Arduino Uno and Arduino MEGA)
 4. **Currently Workin on:** Record audio from the mobile device itself using the app
  	- Can then connect a wired microphone or a bluetooth transmitter (ex. https://www.nuheara.com/ca/products/bluetooth-transmitter/?gclid=CjwKCAjw07qDBhBxEiwA6pPbHroSNQ7TXyDA4DDuEuUM7V-f3FE1iOZgp-nFUiinv00lj_MFBls3_RoCx0YQAvD_BwE)
- 	- Android has its own speechRecognizer class (https://medium.com/voice-tech-podcast/android-speech-to-text-tutorial-8f6fa71606ac)
+ 	- Android has its own speechRecognizer class (https://betterprogramming.pub/implement-continuous-speech-recognition-on-android-1dd2f4b562fd)
 5. **Potential Idea to Try Out:** Connect a bluetooth microphone concurrently with the bluetooth connection with the Arudino using the app
 6. Battery Operation (4.5V to 21 V):
  	- Broke open portable charger
