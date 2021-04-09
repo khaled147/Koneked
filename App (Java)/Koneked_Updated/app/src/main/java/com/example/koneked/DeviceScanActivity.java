@@ -1,3 +1,9 @@
+/**
+ * @author Khaled Elmalawany
+ * @version 2.1
+ * @since 1.0
+ */
+
 package com.example.koneked;
 
 import android.Manifest;
@@ -16,6 +22,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -28,7 +36,8 @@ public class DeviceScanActivity extends ListActivity {
     private static final int REQUEST_ENABLE_BT = 100;
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
-    private final int REQUEST_LOCATION_PERMISSION = 1;
+    private final int REQUEST_LOCATION_PERMISSION = 111;
+    private final int REQUEST_MICROPHONE_PERMISSION = 222;
     private LeDeviceListAdapter mLeDeviceListAdapter;
     // Device scan callback.
     private final BluetoothAdapter.LeScanCallback mLeScanCallback =
@@ -75,6 +84,8 @@ public class DeviceScanActivity extends ListActivity {
             finish();
             return;
         }
+
+        requestAudioPermissions();
     }
 
     @Override
@@ -83,6 +94,18 @@ public class DeviceScanActivity extends ListActivity {
 
         // Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+
+        if (requestCode == REQUEST_MICROPHONE_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // permission is granted!
+                Toast.makeText(this, "Koneked is now able to use the microphone",
+                        Toast.LENGTH_LONG).show();
+            } else {
+                // permission denied!
+                // Disable the functionality that depends on this permission.
+                Toast.makeText(this, "Permissions Denied to record audio", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @AfterPermissionGranted(REQUEST_LOCATION_PERMISSION)
@@ -93,6 +116,20 @@ public class DeviceScanActivity extends ListActivity {
         } else {
             EasyPermissions.requestPermissions(this, getString(R.string.location_prompt),
                     REQUEST_LOCATION_PERMISSION, perms);
+        }
+    }
+
+    private void requestAudioPermissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            //When permission is not granted by user, show them message why this permission is needed.
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
+                Toast.makeText(this, "Please grant permission to use the microphone",
+                        Toast.LENGTH_LONG).show();
+            }
+            //Give user option to still opt-in the permissions
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO},
+                    REQUEST_MICROPHONE_PERMISSION);
         }
     }
 
@@ -209,7 +246,7 @@ public class DeviceScanActivity extends ListActivity {
 
         public LeDeviceListAdapter() {
             super();
-            mLeDevices = new ArrayList<BluetoothDevice>();
+            mLeDevices = new ArrayList<>();
             mInflator = DeviceScanActivity.this.getLayoutInflater();
         }
 

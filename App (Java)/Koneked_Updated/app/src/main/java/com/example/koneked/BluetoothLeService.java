@@ -1,5 +1,10 @@
 //TODO: Implement Error Handling
 // Implement Python and Java together: https://chaquo.com/chaquopy/doc/current/android.html
+/**
+ * @author Khaled Elmalawany
+ * @version 4.2
+ * @since 1.0
+ */
 
 package com.example.koneked;
 
@@ -8,13 +13,22 @@ import android.bluetooth.*;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.util.Log;
+import android.widget.Toast;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -33,11 +47,12 @@ public class BluetoothLeService extends Service {
     public final static String EXTRA_DATA =
             "com.example.bluetooth.le.EXTRA_DATA";
     public final static UUID UUID_TRANSMITTER_CHARACTERISTIC =
-            UUID.fromString(SampleGattAttributes.TRANSMITTER_CHARACTERISTIC);
+            UUID.fromString(GattAttributes.TRANSMITTER_CHARACTERISTIC);
     public final static UUID UUID_RECEIVER_CHARACTERISTIC =
-            UUID.fromString(SampleGattAttributes.RECEIVER_CHARACTERISTIC);
-    public final static UUID UUID_MICROPHONE_AND_MOTOR_SERVICE =
-            UUID.fromString(SampleGattAttributes.MICROPHONE_AND_MOTOR_SERVICE);
+            UUID.fromString(GattAttributes.RECEIVER_CHARACTERISTIC);
+    public final static UUID UUID_TRANSMITTER_AND_RECEIVER_SERVICE =
+            UUID.fromString(GattAttributes.TRANSMITTER_AND_RECEIVER_SERVICE);
+    public BluetoothGattCharacteristic arduinoReceiver;
     private final static String TAG = BluetoothLeService.class.getSimpleName();
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
@@ -48,11 +63,8 @@ public class BluetoothLeService extends Service {
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
-    private PyObject pyo;
-    private int audioDataCounter = 0;
-    // Every data is processed at 0.016 seconds so the following allows to "wait" for 1.6 seconds
-    private int arrayLength = 256 * 10;
-    private int[] audioDataArray = new int[arrayLength];
+    private SpeechRecognizer mSpeechRecognizer;
+    private Intent mSpeechRecognizerIntent;
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
@@ -71,6 +83,7 @@ public class BluetoothLeService extends Service {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
+                mSpeechRecognizer.stopListening();
                 Log.i(TAG, "Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
             }
@@ -102,14 +115,6 @@ public class BluetoothLeService extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-            if(!Python.isStarted()) {
-                Log.i(TAG, "onCharacteristicChanged: Python Started");
-                Python.start(new AndroidPlatform(BluetoothLeService.this));
-                // Create Python instance
-                final Python py = Python.getInstance();
-                // Create Python Object and load script
-                pyo = py.getModule("vibration_language_system");
-            }
         }
     };
 
@@ -125,21 +130,9 @@ public class BluetoothLeService extends Service {
             if (UUID_TRANSMITTER_CHARACTERISTIC.equals(characteristic.getUuid())) {
                 final StringBuilder stringBuilder = new StringBuilder(data.length);
                 for (byte byteChar : data) {
-                    stringBuilder.append(String.format("%d", byteChar));
+                    stringBuilder.append(String.format(Locale.CANADA, "%d", byteChar));
                 }
                 intent.putExtra(EXTRA_DATA, stringBuilder.toString());
-                if(Python.isStarted()) {
-                    if(audioDataCounter >= 256 * 10) {
-                        // Call main function in python file
-                        PyObject obj = pyo.callAttr("main", audioDataArray);
-                        Log.e(TAG, "broadcastUpdate: Testing");
-                        audioDataCounter = 0;
-                    } else {
-                        audioDataArray[audioDataCounter] = Integer.parseInt(stringBuilder.toString());
-                    }
-                    audioDataCounter++;
-                    Log.e(TAG, "broadcastUpdate: " + audioDataCounter);
-                }
             } else {
                 // For all other profiles, writes the data formatted in HEX.
                 final StringBuilder stringBuilder = new StringBuilder(data.length);
@@ -150,6 +143,87 @@ public class BluetoothLeService extends Service {
             sendBroadcast(intent);
         }
     }
+
+    //-------------------------- Speech Recognition -------------------------------------------
+    public void establishConnection() {
+        if (SpeechRecognizer.isRecognitionAvailable(this)) {
+            // Define the Receiver characteristic
+            arduinoReceiver = mBluetoothGatt.getService(UUID_TRANSMITTER_AND_RECEIVER_SERVICE)
+                    .getCharacteristic(UUID_RECEIVER_CHARACTERISTIC);
+
+            // Assign the Speech Recognizer
+            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(BluetoothLeService.this);
+
+            // Initialize Intent to sent to speechRecognizer
+            // ACTION_RECOGNIZE_SPEECH starts an activity that will prompt the user for speech and send it through a speech recognizer
+            mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            // EXTRA_LANGUAGE_MODEL: Informs the recognizer which speech model to prefer
+            // LANGUAGE_MODEL_FREE_FORM: Use a language model based on free-form speech recognition
+            // LANGUAGE_MODEL_WEB_SEARCH: Use a language model based on keyword search (should be faster)
+            mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+            // EXTRA_LANGUAGE: Optional IETF language tag (as defined by BCP 47 - in this case CANADA)
+            mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+            // EXTRA_MAX_RESULTS: Set the maximum length of the results array
+            mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+            //TODO: Implement the following by checking for WiFi connection
+            //mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
+
+            // Set the Listener
+            mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
+                @Override
+                public void onReadyForSpeech(Bundle bundle) {
+                }
+
+                @Override
+                public void onBeginningOfSpeech() {
+                    Toast.makeText(BluetoothLeService.this, R.string.speak, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onRmsChanged(float v) {
+                }
+
+                @Override
+                public void onBufferReceived(byte[] bytes) {
+                }
+
+                @Override
+                public void onEndOfSpeech() {
+                }
+
+                @Override
+                public void onError(int i) {
+                    mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
+                }
+
+                @Override
+                public void onResults(Bundle bundle) {
+                    ArrayList<String> data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                    writeCharacteristic(arduinoReceiver, data.get(0).getBytes());
+                    mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
+                }
+
+                @Override
+                public void onPartialResults(Bundle bundle) {
+                    ArrayList<String> data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                    writeCharacteristic(arduinoReceiver, data.get(0).getBytes());
+                }
+
+                @Override
+                public void onEvent(int i, Bundle bundle) {
+                }
+            });
+
+            // Start the Speech Recognizer
+            mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
+        } else {
+            Toast.makeText(BluetoothLeService.this, R.string.speech_recognizer_error,
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+    //------------------------------------------------------------------------------------------
+
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -301,7 +375,7 @@ public class BluetoothLeService extends Service {
         }
         mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
         BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-                UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
+                UUID.fromString(GattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
         descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
         mBluetoothGatt.writeDescriptor(descriptor);
     }
@@ -320,7 +394,7 @@ public class BluetoothLeService extends Service {
         }
 
         BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-                UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
+                UUID.fromString(GattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
         descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
         mBluetoothGatt.writeDescriptor(descriptor);
 

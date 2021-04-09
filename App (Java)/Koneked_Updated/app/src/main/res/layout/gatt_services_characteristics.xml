@@ -15,13 +15,13 @@
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="@string/label_device_address"
-                      android:textSize="18sp"/>
+                      android:textSize="18dp"/>
             <Space android:layout_width="5dp"
                    android:layout_height="wrap_content"/>
             <TextView android:id="@+id/device_address"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:textSize="18sp"/>
+                      android:textSize="18dp"/>
         </LinearLayout>
         <LinearLayout android:orientation="horizontal"
                       android:layout_width="match_parent"
@@ -30,14 +30,14 @@
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="@string/label_state"
-                      android:textSize="18sp"/>
+                      android:textSize="18dp"/>
             <Space android:layout_width="5dp"
                    android:layout_height="wrap_content"/>
             <TextView android:id="@+id/connection_state"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:text="@string/disconnected"
-                      android:textSize="18sp"/>
+                      android:textSize="18dp"/>
         </LinearLayout>
         <LinearLayout android:orientation="horizontal"
                       android:layout_width="match_parent"
@@ -46,14 +46,14 @@
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="@string/label_data"
-                      android:textSize="18sp"/>
+                      android:textSize="18dp"/>
             <Space android:layout_width="5dp"
                    android:layout_height="wrap_content"/>
             <TextView android:id="@+id/data_value"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:text="@string/no_data"
-                      android:textSize="18sp"/>
+                      android:textSize="18dp"/>
         </LinearLayout>
         <LinearLayout android:orientation="horizontal"
                       android:layout_width="match_parent"
@@ -64,19 +64,29 @@
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="@string/motor_input"
-                      android:textSize="18sp"/>
+                      android:textSize="18dp"/>
             <Space android:layout_width="5dp"
                    android:layout_height="wrap_content"/>
             <Switch android:id="@+id/motor_switch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:textSize="14sp"/>
+                    android:textSize="14dp"/>
         </LinearLayout>
         <ExpandableListView
                 android:nestedScrollingEnabled="true"
                 android:id="@+id/gatt_services_list"
                 android:layout_width="match_parent"
-                android:layout_height="300sp"/>
+                android:layout_height="250dp">
+        </ExpandableListView>
+        <Button
+                android:visibility="gone"
+                android:id="@+id/start_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_tiny"
+                android:layout_gravity="center"
+                android:text="@string/start_button_disconnected"
+        />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

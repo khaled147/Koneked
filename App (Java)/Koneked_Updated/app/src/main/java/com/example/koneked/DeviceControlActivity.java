@@ -1,3 +1,9 @@
+/**
+ * @author Khaled Elmalawany
+ * @version 1.6
+ * @since 1.0
+ */
+
 package com.example.koneked;
 
 import android.app.Activity;
@@ -28,11 +34,10 @@ public class DeviceControlActivity extends Activity {
     private final static String TAG = DeviceControlActivity.class.getSimpleName();
     private TextView mConnectionState;
     private TextView mDataField;
-    private Switch mSwitchField;
-    private LinearLayout mSwitchLayout;
     private String mDeviceAddress;
     private ExpandableListView mGattServicesList;
     private BluetoothLeService mBluetoothLeService;
+    private Button mButtonField;
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -66,27 +71,32 @@ public class DeviceControlActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             Log.i(TAG, action);
-            if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                mConnected = true;
-                updateConnectionState(R.string.connected);
-                invalidateOptionsMenu();
-            } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                mConnected = false;
-                updateConnectionState(R.string.disconnected);
-                invalidateOptionsMenu();
-                clearUI();
-            } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                // Show all the supported services and characteristics on the user interface.
-                displayGattServices(mBluetoothLeService.getSupportedGattServices());
-            } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+            switch (action) {
+                case BluetoothLeService.ACTION_GATT_CONNECTED:
+                    mConnected = true;
+                    updateConnectionState(R.string.connected);
+                    invalidateOptionsMenu();
+                    break;
+                case BluetoothLeService.ACTION_GATT_DISCONNECTED:
+                    mConnected = false;
+                    updateConnectionState(R.string.disconnected);
+                    mButtonField.setText(R.string.start_button_disconnected);
+                    invalidateOptionsMenu();
+                    clearUI();
+                    break;
+                case BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED:
+                    // Show all the supported services and characteristics on the user interface.
+                    displayGattServices(mBluetoothLeService.getSupportedGattServices());
+                    break;
+                case BluetoothLeService.ACTION_DATA_AVAILABLE:
+                    displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+                    break;
             }
         }
     };
     private BluetoothGattCharacteristic mNotifyCharacteristic;
-    // If a given GATT characteristic is selected, check for supported features.  This sample
-    // demonstrates 'Read' and 'Notify' features.  See
-    // http://d.android.com/reference/android/bluetooth/BluetoothGatt.html for the complete
+    // If a given GATT characteristic is selected, check for supported features.  This sample demonstrates 'Read' and
+    // 'Notify' features.  See http://d.android.com/reference/android/bluetooth/BluetoothGatt.html for the complete
     // list of supported characteristic features.
     private final ExpandableListView.OnChildClickListener servicesListClickListener =
             new ExpandableListView.OnChildClickListener() {
@@ -109,30 +119,30 @@ public class DeviceControlActivity extends Activity {
                             }
                             mBluetoothLeService.readCharacteristic(characteristic);
                         }
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0 && !isTesting) {
-                            mNotifyCharacteristic = characteristic;
-                            mBluetoothLeService.setCharacteristicIndication(
-                                    characteristic, true);
-                        }
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_WRITE) > 0 && isTesting) {
-                            byte[] value = "U".getBytes();
-                            if (mNotifyCharacteristic != null) {
-                                mBluetoothLeService.setCharacteristicNotification(mNotifyCharacteristic, false);
-                                mNotifyCharacteristic = null;
+                            if ((charaProp | BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0 && !isTesting) {
+                                mNotifyCharacteristic = characteristic;
+                                mBluetoothLeService.setCharacteristicIndication(characteristic, true);
                             }
-                            boolean state = mBluetoothLeService.writeCharacteristic(characteristic, value);
-                            if (!state) {
-                                // TODO: Fix the logical error that occurs when tapping on the microphone characteristic
-                                Toast.makeText(DeviceControlActivity.this, R.string.motor_setup_error,
-                                        Toast.LENGTH_LONG).show();
+                            if ((charaProp | BluetoothGattCharacteristic.PROPERTY_WRITE) > 0 && isTesting) {
+                                byte[] value = "U".getBytes();
+                                if (mNotifyCharacteristic != null) {
+                                    mBluetoothLeService.setCharacteristicNotification(mNotifyCharacteristic, false);
+                                    mNotifyCharacteristic = null;
+                                }
+                                boolean state = mBluetoothLeService.writeCharacteristic(characteristic, value);
+                                if (!state) {
+                                    // TODO: Fix the logical error that occurs when tapping on the microphone characteristic
+                                    Toast.makeText(DeviceControlActivity.this, R.string.motor_setup_error,
+                                            Toast.LENGTH_LONG).show();
+                                }
                             }
-                        }
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0 && !isTesting) {
-                            Log.d(TAG, "onChildClick: Characteristic notification for " + groupPosition + ", " +
-                                    childPosition);
-                            mNotifyCharacteristic = characteristic;
-                            mBluetoothLeService.setCharacteristicNotification(characteristic, true);
-                        }
+                            if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0 && !isTesting) {
+                                Log.d(TAG, "onChildClick: Characteristic notification for " + groupPosition + ", " +
+                                        childPosition);
+                                mNotifyCharacteristic = characteristic;
+                                mBluetoothLeService.setCharacteristicNotification(characteristic, true);
+                            }
+
                         return true;
                     }
                     return false;
@@ -169,13 +179,16 @@ public class DeviceControlActivity extends Activity {
         mGattServicesList.setOnChildClickListener(servicesListClickListener);
         mConnectionState = findViewById(R.id.connection_state);
         mDataField = findViewById(R.id.data_value);
-        mSwitchField = findViewById(R.id.motor_switch);
-        mSwitchLayout = findViewById(R.id.switch_layout);
+        Switch mSwitchField = findViewById(R.id.motor_switch);
+        LinearLayout mSwitchLayout = findViewById(R.id.switch_layout);
+        mButtonField = findViewById(R.id.start_button);
 
-        Log.e(TAG, "onCreate: " + mDeviceName);
+        Log.i(TAG, "onCreate: " + mDeviceName);
+        assert mDeviceName != null;
         if (mDeviceName.equals("BLE Koneked Device")) {
             Toast.makeText(this, R.string.found_device, Toast.LENGTH_SHORT).show();
             mSwitchLayout.setVisibility(View.VISIBLE);
+            mButtonField.setVisibility(View.VISIBLE);
         }
 
         mSwitchField.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -194,6 +207,14 @@ public class DeviceControlActivity extends Activity {
         getActionBar().setDisplayHomeAsUpEnabled(true);
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+
+        mButtonField.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mBluetoothLeService.establishConnection();
+                mButtonField.setText(R.string.start_button_connected);
+            }
+        });
     }
 
     @Override
@@ -283,13 +304,12 @@ public class DeviceControlActivity extends Activity {
             HashMap<String, String> currentServiceData = new HashMap<>();
             uuid = gattService.getUuid().toString();
             currentServiceData.put(
-                    LIST_NAME, SampleGattAttributes.lookup(uuid, unknownServiceString));
+                    LIST_NAME, GattAttributes.lookup(uuid, unknownServiceString));
             currentServiceData.put(LIST_UUID, uuid);
             gattServiceData.add(currentServiceData);
 
             ArrayList<HashMap<String, String>> gattCharacteristicGroupData = new ArrayList<>();
-            List<BluetoothGattCharacteristic> gattCharacteristics =
-                    gattService.getCharacteristics();
+            List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
             ArrayList<BluetoothGattCharacteristic> charas = new ArrayList<>();
 
             // Loops through available Characteristics.
@@ -298,7 +318,7 @@ public class DeviceControlActivity extends Activity {
                 HashMap<String, String> currentCharaData = new HashMap<>();
                 uuid = gattCharacteristic.getUuid().toString();
                 currentCharaData.put(
-                        LIST_NAME, SampleGattAttributes.lookup(uuid, unknownCharaString));
+                        LIST_NAME, GattAttributes.lookup(uuid, unknownCharaString));
                 currentCharaData.put(LIST_UUID, uuid);
                 gattCharacteristicGroupData.add(currentCharaData);
             }

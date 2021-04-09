@@ -1,8 +1,7 @@
-# NOTE: Do not need PyAudio library
+# NOTE: Cannot use PyAudio library
 # Resource: https://realpython.com/python-speech-recognition/#working-with-audio-files
-# TODO: Convert audio data from arduino to wav source file to send to main
 
-import speech_recognition as s_r
+import speech_recognition as sr
 
 dit = 1000
 dah = dit*3
@@ -191,42 +190,12 @@ def cha_to_vib(x):
         vib3 = dit
  #   print(vib1, vib2, vib3, x)
 
-def main(stream):
-    CHUNK = 4096
-    CHANNELS = 1
-    RATE = 16000
-    RECORD_SECONDS = 1
-    WAVE_OUTPUT_FILENAME = "test.wav"
-
-    frames = []
-    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-        data = stream.read(CHUNK)
-        print(data)
-        frames.append(data)
-
-    wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
-    wf.setnchannels(CHANNELS)
-    wf.setframerate(RATE)
-    wf.writeframes(b''.join(frames))
-    wf.close()
-    return wf
-    # = s_r.Recognizer()
-    # Implements Google Web Speech API
-    #test = r.recognize_google(audio)
-    #return test #to print voice into text
+def main(wav_file):
+    r = sr.Recognizer()
+    wav = sr.AudioFile(wav_file)
+    with wav as source:
+        audio = r.record(source)
+    return r.recognize_google(audio)
 
 #for cha in test:
 #    cha_to_vib(cha)
-
-
-#my_mic = s_r.Microphone(device_index=1) #my device index is 1, you have to put your device index
-#with my_mic as source:
-#    print("Say now!!!!")
-#    r.adjust_for_ambient_noise(source) #reduce noise
-#    audio = r.listen(source) #take voice input from the microphone
-
-#f = open("test.txt", 'rt')
-#lines = f.readlines()
-#for line in lines:
-#    for cha in line:
-#        cha_to_vib(cha)
