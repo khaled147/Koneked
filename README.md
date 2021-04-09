@@ -23,6 +23,7 @@ Project for ENEL 400 at the University of Calgary
  	- **Issue:** Both Require WAV file --> ~~**Solution:** Buy a microphone wired to the Arduino (https://www.instructables.com/Make-Your-Own-Spy-Bug-Arduino-Voice-Recorder/)~~ (Did not work as TMRpcm only works on Arduino Uno and Arduino MEGA)
 4. **Currently Workin on:** Record audio from the mobile device itself using the app
  	- Can then connect a wired microphone or a bluetooth transmitter (ex. https://www.nuheara.com/ca/products/bluetooth-transmitter/?gclid=CjwKCAjw07qDBhBxEiwA6pPbHroSNQ7TXyDA4DDuEuUM7V-f3FE1iOZgp-nFUiinv00lj_MFBls3_RoCx0YQAvD_BwE)
+ 	- Android has its own speechRecognizer class (https://medium.com/voice-tech-podcast/android-speech-to-text-tutorial-8f6fa71606ac)
 5. **Potential Idea to Try Out:** Connect a bluetooth microphone concurrently with the bluetooth connection with the Arudino using the app
 6. Battery Operation (4.5V to 21 V):
  	- Broke open portable charger
