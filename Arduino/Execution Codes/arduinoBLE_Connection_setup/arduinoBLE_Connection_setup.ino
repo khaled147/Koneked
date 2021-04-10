@@ -1,3 +1,5 @@
+// ArduinoBLE Connection Setup
+
 // Implemented from https://developer.ibm.com/technologies/iot/tutorials/build-connected-devices-using-ble-apis/
 // TODO: Implement PDM to PCM (know as decimation) to WAV conversions of audio input
 // https://create.arduino.cc/projecthub/voske65/arduino-zero-pdm-microphone-9136cb?ref=tag&ref_id=microphone&offset=5
