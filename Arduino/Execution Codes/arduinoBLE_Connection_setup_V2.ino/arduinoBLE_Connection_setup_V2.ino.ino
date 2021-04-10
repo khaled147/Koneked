@@ -23,9 +23,9 @@ BLEDescriptor txDescriptor("2902", "ABC1");
 #define DIT 500
 #define DAH DIT*3
 
-#define  MOTOR_1_PIN 2
-#define  MOTOR_2_PIN 4
-#define  MOTOR_3_PIN 6
+#define  MOTOR_1_PIN 12
+#define  MOTOR_2_PIN 3
+#define  MOTOR_3_PIN 2
 
 void setup() {
   // Start serial
