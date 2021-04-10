@@ -30,14 +30,14 @@
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="@string/label_state"
-                      android:textSize="18dp"/>
+                      android:textSize="18sp"/>
             <Space android:layout_width="5dp"
                    android:layout_height="wrap_content"/>
             <TextView android:id="@+id/connection_state"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:text="@string/disconnected"
-                      android:textSize="18dp"/>
+                      android:textSize="18sp"/>
         </LinearLayout>
         <LinearLayout android:orientation="horizontal"
                       android:layout_width="match_parent"
@@ -46,14 +46,14 @@
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="@string/label_data"
-                      android:textSize="18dp"/>
+                      android:textSize="18sp"/>
             <Space android:layout_width="5dp"
                    android:layout_height="wrap_content"/>
             <TextView android:id="@+id/data_value"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:text="@string/no_data"
-                      android:textSize="18dp"/>
+                      android:textSize="18sp"/>
         </LinearLayout>
         <LinearLayout android:orientation="horizontal"
                       android:layout_width="match_parent"
@@ -64,7 +64,7 @@
             <TextView android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="@string/motor_input"
-                      android:textSize="18dp"/>
+                      android:textSize="18sp"/>
             <Space android:layout_width="5dp"
                    android:layout_height="wrap_content"/>
             <Switch android:id="@+id/motor_switch"

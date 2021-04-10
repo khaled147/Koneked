@@ -17,6 +17,11 @@
     <string name="start_button_connecting">Connecting…</string>
     <string name="start_button_connected">Connected</string>
     <string name="speak">You may speak now</string>
+    <!-- WiFi items -->
+    <string name="access_point_connect">Please connect to a WiFi access point for better results</string>
+    <string name="wifi_adapter_connect">WiFi has been enabled</string>
+    <string name="wifi_adapter_error">Unable to enable WiFi.\nPlease connect to a WiFi access point and tap again for
+        better results</string>
 
     <string name="streaming">Streaming</string>
 

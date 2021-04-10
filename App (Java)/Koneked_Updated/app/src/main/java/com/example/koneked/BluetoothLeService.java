@@ -1,6 +1,6 @@
 //TODO: Implement Error Handling
 // Implement Python and Java together: https://chaquo.com/chaquopy/doc/current/android.html
-/**
+/*
  * @author Khaled Elmalawany
  * @version 4.2
  * @since 1.0
@@ -20,11 +20,6 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.widget.Toast;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
-import com.chaquo.python.PyObject;
-import com.chaquo.python.Python;
-import com.chaquo.python.android.AndroidPlatform;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -145,7 +140,7 @@ public class BluetoothLeService extends Service {
     }
 
     //-------------------------- Speech Recognition -------------------------------------------
-    public void establishConnection() {
+    public void establishConnection(boolean wifiConnected) {
         if (SpeechRecognizer.isRecognitionAvailable(this)) {
             // Define the Receiver characteristic
             arduinoReceiver = mBluetoothGatt.getService(UUID_TRANSMITTER_AND_RECEIVER_SERVICE)
@@ -166,18 +161,19 @@ public class BluetoothLeService extends Service {
             mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
             // EXTRA_MAX_RESULTS: Set the maximum length of the results array
             mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
-            //TODO: Implement the following by checking for WiFi connection
-            //mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
+            if (!wifiConnected) {
+                mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
+            }
 
             // Set the Listener
             mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
                 @Override
                 public void onReadyForSpeech(Bundle bundle) {
+                    Toast.makeText(BluetoothLeService.this, R.string.speak, Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onBeginningOfSpeech() {
-                    Toast.makeText(BluetoothLeService.this, R.string.speak, Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
@@ -280,7 +276,7 @@ public class BluetoothLeService extends Service {
         }
 
         // Previously connected device.  Try to reconnect.
-        if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress)
+        if (address.equals(mBluetoothDeviceAddress)
                 && mBluetoothGatt != null) {
             Log.d(TAG, "Trying to use an existing mBluetoothGatt for connection.");
             if (mBluetoothGatt.connect()) {

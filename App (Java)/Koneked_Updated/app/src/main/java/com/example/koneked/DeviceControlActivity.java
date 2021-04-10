@@ -1,4 +1,4 @@
-/**
+/*
  * @author Khaled Elmalawany
  * @version 1.6
  * @since 1.0
@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.*;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -38,6 +39,7 @@ public class DeviceControlActivity extends Activity {
     private ExpandableListView mGattServicesList;
     private BluetoothLeService mBluetoothLeService;
     private Button mButtonField;
+    private boolean isWiFiConnected;
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
@@ -172,6 +174,7 @@ public class DeviceControlActivity extends Activity {
         final Intent intent = getIntent();
         String mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
+        WifiManager wifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
         // Sets up UI references.
         ((TextView) findViewById(R.id.device_address)).setText(mDeviceAddress);
@@ -208,10 +211,36 @@ public class DeviceControlActivity extends Activity {
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
+        // Check for WiFi connection
+        if (wifiMgr.isWifiEnabled()) { // Wi-Fi adapter is ON
+            if( wifiMgr.getConnectionInfo().getNetworkId() == -1 ) {
+                // Not connected to an access point
+                Toast.makeText(this, R.string.access_point_connect, Toast.LENGTH_LONG).show();
+                isWiFiConnected = false;
+            } else {
+                isWiFiConnected = true;
+            }
+        }
+        else {
+            // Wi-Fi adapter is OFF
+            if(wifiMgr.setWifiEnabled(true)) {
+                Toast.makeText(this, R.string.wifi_adapter_connect, Toast.LENGTH_LONG).show();
+                if( wifiMgr.getConnectionInfo().getNetworkId() == -1 ) {
+                    // Not connected to an access point
+                    Toast.makeText(this, R.string.access_point_connect, Toast.LENGTH_LONG).show();
+                    isWiFiConnected = false;
+                } else {
+                    isWiFiConnected = true;
+                }
+            } else {
+                isWiFiConnected = false;
+            }
+        }
+
         mButtonField.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mBluetoothLeService.establishConnection();
+                mBluetoothLeService.establishConnection(isWiFiConnected);
                 mButtonField.setText(R.string.start_button_connected);
             }
         });
