@@ -5,6 +5,7 @@
 
 #include <ArduinoBLE.h>
 #include <PDM.h>
+#include <Filters.h>
 
 #define NAME_OF_PERIPHERAL "BLE Koneked Device"
 
@@ -40,6 +41,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(LEDR, OUTPUT);
   pinMode(LEDG, OUTPUT);
+
 
   // Prepare Motor pins
   pinMode(MOTOR_1_PIN, OUTPUT);
@@ -95,7 +97,8 @@ void setup() {
   // Advertise to the world so device can be found
   BLE.advertise();
 }
-
+  //Creates a dsp lowpass filter with a 200hz cutoff freq.
+  FilterOnePole lowpassFilter( LOWPASS, 200);
 void loop()
 {
   BLEDevice central = BLE.central();
@@ -111,7 +114,7 @@ void loop()
         for (int i = 0; i < samplesRead; i++) {
           Serial.print(sampleBuffer[i]);
           //Apply FFT
-          // Apply LPF
+          lowpassFilter.input(sampleBuffer[i]);// I am assuming this loop is sampling audio live
           // Reverse FFT
           txChar.writeValue(sampleBuffer[i]);
         }
