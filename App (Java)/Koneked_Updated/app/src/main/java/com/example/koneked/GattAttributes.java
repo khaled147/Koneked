@@ -23,7 +23,7 @@ public class GattAttributes {
         // Available Services.
         attributes.put("00001800-0000-1000-8000-00805f9b34fb", "Generic Access Profile");
         attributes.put("00001801-0000-1000-8000-00805f9b34fb", "Generic Attribute Service");
-        attributes.put(TRANSMITTER_AND_RECEIVER_SERVICE, "Microphone and Motor Service");
+        attributes.put(TRANSMITTER_AND_RECEIVER_SERVICE, "Transmitter and Receiver Service");
         // Available Characteristics.
         attributes.put("00002a00-0000-1000-8000-00805f9b34fb", "Device Name");
         attributes.put("00002a01-0000-1000-8000-00805f9b34fb", "Appearance");
