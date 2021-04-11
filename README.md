@@ -1,6 +1,9 @@
 # Koneked
 Project for ENEL 400 at the University of Calgary
 
+**Release**
+The App allows connection to the Koneked Hearing Aid device. The user can speak directly to the phone's mic, plug in a microphone or even a bluetooth transmitter. The app will convert the speech to text and send the text to the device to convert it to our very own altered morse code.
+
 **Ideas:**
 1. Use the PDM microphone on Arduino Nano 33 BLE Sense to record to a WAV file (*Unable to get it to work, but here are some notes*)
  	- ~~Probably need to implement a FIR Decimation filter (https://www.theunterminatedstring.com/probing-pdm/)~~ (*only necessary if need to convert from PDM to PCM*)
