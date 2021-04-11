@@ -6,7 +6,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.example.konked"
+        applicationId "com.koneks.konked"
         minSdkVersion 23
         targetSdkVersion 29
         versionCode 5

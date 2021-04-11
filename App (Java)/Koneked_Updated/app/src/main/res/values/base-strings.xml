@@ -5,8 +5,8 @@
         <![CDATA[
 
 
-            This sample demonstrates how to use the Bluetooth LE Generic Attribute Profile (GATT)
-            to transmit arbitrary data between devices.
+            This app allows connection between the Koneked Hearing Aid device through Bluetooth
+            and enables the speech to text conversion.
 
 
         ]]>

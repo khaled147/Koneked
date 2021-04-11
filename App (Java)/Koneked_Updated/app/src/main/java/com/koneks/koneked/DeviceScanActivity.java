@@ -4,7 +4,7 @@
  * @since 1.0
  */
 
-package com.example.koneked;
+package com.koneks.koneked;
 
 import android.Manifest;
 import android.app.Activity;

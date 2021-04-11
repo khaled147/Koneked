@@ -5,7 +5,7 @@
  */
 
 
-package com.example.koneked;
+package com.koneks.koneked;
 
 import java.util.HashMap;
 

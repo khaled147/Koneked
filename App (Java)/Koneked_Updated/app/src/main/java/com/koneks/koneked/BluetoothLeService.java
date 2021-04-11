@@ -6,7 +6,7 @@
  * @since 1.0
  */
 
-package com.example.koneked;
+package com.koneks.koneked;
 
 import android.app.Service;
 import android.bluetooth.*;
