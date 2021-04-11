@@ -1,7 +1,7 @@
 # Koneked
 Project for ENEL 400 at the University of Calgary
 
-**Release**
+**Release** </ br>
 The App allows connection to the Koneked Hearing Aid device. The user can speak directly to the phone's mic, plug in a microphone or even a bluetooth transmitter. The app will convert the speech to text and send the text to the device to convert it to our very own altered morse code.
 
 **Ideas:**
