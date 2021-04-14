@@ -1,0 +1,15 @@
+---
+Models made using Solidworks 2020
+Gcode made with Slic3r 2020
+
+OTHER
+----------
+Different Versions for Rechargable power supply taken from cheap 2600mmAh block
+
+Decided to go with 9V battery as it is compact...
+
+Daughter Circuit to be added in empty space in in CaseVersion2 as 
+Arduino did not output enough current to buzzers...
+
+---
+MoGrona - 2021
