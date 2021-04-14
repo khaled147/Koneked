@@ -31,22 +31,14 @@ import java.util.UUID;
  * given Bluetooth LE device.
  */
 public class BluetoothLeService extends Service {
-    public final static String ACTION_GATT_CONNECTED =
-            "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
-    public final static String ACTION_GATT_DISCONNECTED =
-            "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED";
-    public final static String ACTION_GATT_SERVICES_DISCOVERED =
-            "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
-    public final static String ACTION_DATA_AVAILABLE =
-            "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
-    public final static String EXTRA_DATA =
-            "com.example.bluetooth.le.EXTRA_DATA";
-    public final static UUID UUID_TRANSMITTER_CHARACTERISTIC =
-            UUID.fromString(GattAttributes.TRANSMITTER_CHARACTERISTIC);
-    public final static UUID UUID_RECEIVER_CHARACTERISTIC =
-            UUID.fromString(GattAttributes.RECEIVER_CHARACTERISTIC);
-    public final static UUID UUID_TRANSMITTER_AND_RECEIVER_SERVICE =
-            UUID.fromString(GattAttributes.TRANSMITTER_AND_RECEIVER_SERVICE);
+    public final static String ACTION_GATT_CONNECTED = "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
+    public final static String ACTION_GATT_DISCONNECTED = "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED";
+    public final static String ACTION_GATT_SERVICES_DISCOVERED = "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
+    public final static String ACTION_DATA_AVAILABLE = "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
+    public final static String EXTRA_DATA = "com.example.bluetooth.le.EXTRA_DATA";
+    public final static UUID UUID_TRANSMITTER_CHARACTERISTIC = UUID.fromString(GattAttributes.TRANSMITTER_CHARACTERISTIC);
+    public final static UUID UUID_RECEIVER_CHARACTERISTIC = UUID.fromString(GattAttributes.RECEIVER_CHARACTERISTIC);
+    public final static UUID UUID_TRANSMITTER_AND_RECEIVER_SERVICE = UUID.fromString(GattAttributes.TRANSMITTER_AND_RECEIVER_SERVICE);
     public BluetoothGattCharacteristic arduinoReceiver;
     private final static String TAG = BluetoothLeService.class.getSimpleName();
     private static final int STATE_DISCONNECTED = 0;
@@ -77,7 +69,7 @@ public class BluetoothLeService extends Service {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
-                mSpeechRecognizer.stopListening();
+                mSpeechRecognizer.destroy();
                 Log.i(TAG, "Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
             }
@@ -307,6 +299,10 @@ public class BluetoothLeService extends Service {
      * callback.
      */
     public void disconnect() {
+        // Stop the Speech Recognizer
+        mSpeechRecognizer.stopListening();
+
+        // Disconnect the Bluetooth connection
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return;

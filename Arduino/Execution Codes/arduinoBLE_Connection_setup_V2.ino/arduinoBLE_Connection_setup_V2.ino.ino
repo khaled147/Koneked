@@ -20,7 +20,7 @@ BLEByteCharacteristic txChar("2A58", BLERead | BLENotify | BLEBroadcast);
 BLEDescriptor txDescriptor("2902", "ABC1");
 
 // Dit and Dah timings for altered morse code conversion
-#define DIT 500
+#define DIT 100
 #define DAH DIT*3
 
 #define  MOTOR_1_PIN 12
@@ -632,4 +632,5 @@ void characterToVibration(char x) {
   digitalWrite(MOTOR_1_PIN, LOW);
   digitalWrite(MOTOR_2_PIN, LOW);
   digitalWrite(MOTOR_3_PIN, LOW);
+  delay(DIT / 2);
 }

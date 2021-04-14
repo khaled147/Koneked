@@ -144,7 +144,6 @@ public class DeviceControlActivity extends Activity {
                                 mNotifyCharacteristic = characteristic;
                                 mBluetoothLeService.setCharacteristicNotification(characteristic, true);
                             }
-
                         return true;
                     }
                     return false;
@@ -174,7 +173,7 @@ public class DeviceControlActivity extends Activity {
         final Intent intent = getIntent();
         String mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-        WifiManager wifiMgr = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiMgr = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         // Sets up UI references.
         ((TextView) findViewById(R.id.device_address)).setText(mDeviceAddress);
@@ -215,7 +214,8 @@ public class DeviceControlActivity extends Activity {
         if (wifiMgr.isWifiEnabled()) { // Wi-Fi adapter is ON
             if( wifiMgr.getConnectionInfo().getNetworkId() == -1 ) {
                 // Not connected to an access point
-                Toast.makeText(this, R.string.access_point_connect, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.access_point_connect,
+                        Toast.LENGTH_LONG).show();
                 isWiFiConnected = false;
             } else {
                 isWiFiConnected = true;
@@ -227,7 +227,8 @@ public class DeviceControlActivity extends Activity {
                 Toast.makeText(this, R.string.wifi_adapter_connect, Toast.LENGTH_LONG).show();
                 if( wifiMgr.getConnectionInfo().getNetworkId() == -1 ) {
                     // Not connected to an access point
-                    Toast.makeText(this, R.string.access_point_connect, Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.access_point_connect,
+                            Toast.LENGTH_LONG).show();
                     isWiFiConnected = false;
                 } else {
                     isWiFiConnected = true;
